@@ -47,7 +47,11 @@ namespace KarlsonMPserver
                 clients.Add(i, new Client(i));
             packetHandlers = new Dictionary<int, PacketHandler>
             {
-                { (int)PacketID.welcome, ServerHandle.WelcomeReceived },
+                { (int)PacketID.welcome,    ServerHandle.WelcomeReceived },
+                { (int)PacketID.enterScene, ServerHandle.EnterScene },
+                { (int)PacketID.leaveScene, ServerHandle.LeaveScene },
+                { (int)PacketID.clientInfo, ServerHandle.GetClientInfo },
+                { (int)PacketID.clientMove, ServerHandle.ClientMove },
             };
         }
     }

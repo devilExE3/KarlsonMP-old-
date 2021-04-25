@@ -8,8 +8,40 @@ namespace KarlsonMPclient
 {
     public enum PacketID
     {
+        /// <summary>
+        /// This PackedID is never used, and never should be used
+        /// </summary>
         invalid = 0,
+        /// <summary>
+        /// server: Welcome message |
+        /// client: WelcomeReceived message
+        /// </summary>
         welcome = 1,
+        /// <summary>
+        /// server: Tell us that a player entered the scene we are in |
+        /// client: Tell the server we entered a scene
+        /// </summary>
+        enterScene,
+        /// <summary>
+        /// server: Tell us that a player left the scene we are in |
+        /// client: Tell the server we left a scene
+        /// </summary>
+        leaveScene,
+        /// <summary>
+        /// server: Send us the IDs of the players that are in our scene |
+        /// client: -
+        /// </summary>
+        clientsInScene,
+        /// <summary>
+        /// server: Send us info about a player (such as their username) |
+        /// client: Request info about a player (such as their username)
+        /// </summary>
+        clientInfo,
+        /// <summary>
+        /// server: Send a new player's pos that is in our scene
+        /// client: Send the server our new pos
+        /// </summary>
+        clientMove,
     }
 
     public class Packet : IDisposable
@@ -152,6 +184,14 @@ namespace KarlsonMPclient
         {
             Write(_value.Length); // Add the length of the string to the packet
             buffer.AddRange(Encoding.ASCII.GetBytes(_value)); // Add the string itself
+        }
+        /// <summary>Adds a Vector3 to the packet.</summary>
+        /// <param name="_value">The Vector3 to add.</param>
+        public void Write(UnityEngine.Vector3 _value)
+        {
+            Write(_value.x);
+            Write(_value.y);
+            Write(_value.z);
         }
         #endregion
 
@@ -323,6 +363,12 @@ namespace KarlsonMPclient
             {
                 throw new Exception("Could not read value of type 'string'!");
             }
+        }
+        /// <summary>Reads a Vector3 from the packet.</summary>
+        /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
+        public UnityEngine.Vector3 ReadVector3(bool _moveReadPos = true)
+        {
+            return new UnityEngine.Vector3(ReadFloat(_moveReadPos), ReadFloat(_moveReadPos), ReadFloat(_moveReadPos));
         }
         #endregion
 

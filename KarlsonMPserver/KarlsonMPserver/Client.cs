@@ -14,6 +14,7 @@ namespace KarlsonMPserver
 
         public int id;
         public TCP tcp;
+        public Player player;
 
         public Client(int _id)
         {
@@ -81,7 +82,7 @@ namespace KarlsonMPserver
                     byte[] _packetBytes = receivedData.ReadBytes(_packetLength);
                     ThreadManager.ExecuteOnMainThread(() =>
                     {
-                        Packet _packet = new Packet(_packetBytes);
+                        Packet _packet = new(_packetBytes);
                         int _packetId = _packet.ReadInt();
                         Server.packetHandlers[_packetId](id, _packet);
                     });
@@ -126,6 +127,18 @@ namespace KarlsonMPserver
         public void Disconnect()
         {
             Console.WriteLine($"ID {id} has disconnected");
+            if(player.scene != "")
+            {
+                string old = player.scene;
+                player.scene = "";
+                foreach (Client client in from x in Server.clients
+                                          where x.Value.tcp.socket != null && x.Value.player != null
+                                             && x.Value.player.scene == old
+                                          select x.Value)
+                    ServerSend.LeaveScene(client.id, id);
+            }
+            player = null;
+
             tcp.Disconnect();
         }
     }

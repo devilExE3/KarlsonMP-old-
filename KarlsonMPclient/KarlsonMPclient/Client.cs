@@ -20,9 +20,12 @@ namespace KarlsonMPclient
         public TCP tcp;
 
         public bool isConnected = false;
+        public bool isConnecting = false;
 
         private delegate void PacketHandler(Packet _packet);
         private static Dictionary<int, PacketHandler> packetHandlers;
+
+        public Dictionary<int, OnlinePlayer> players = new Dictionary<int, OnlinePlayer>();
 
         public void Start()
         {
@@ -51,12 +54,15 @@ namespace KarlsonMPclient
                 };
                 receiveBuffer = new byte[dataBufferSize];
                 socket.BeginConnect(instance.ip, instance.port, ConnectCallback, socket);
+                instance.isConnecting = true;
+                // TODO: add timer to check if we connected to a server, and disconnect if not
             }
 
             private void ConnectCallback(IAsyncResult ar)
             {
                 socket.EndConnect(ar);
                 if (!socket.Connected)
+                    // TODO: reconnect to the server, increasing a counter that cancels this process when it reaches 10
                     return;
                 stream = socket.GetStream();
                 receivedData = new Packet();
@@ -146,7 +152,12 @@ namespace KarlsonMPclient
         {
             packetHandlers = new Dictionary<int, PacketHandler>
             {
-                { (int)PacketID.welcome, ClientHandle.Welcome }
+                { (int)PacketID.welcome,        ClientHandle.Welcome },
+                { (int)PacketID.enterScene,     ClientHandle.EnterScene },
+                { (int)PacketID.leaveScene,     ClientHandle.LeaveScene },
+                { (int)PacketID.clientsInScene, ClientHandle.ClientsInScene },
+                { (int)PacketID.clientInfo,     ClientHandle.ClientInfo },
+                { (int)PacketID.clientMove,     ClientHandle.ClientMove },
             };
         }
 

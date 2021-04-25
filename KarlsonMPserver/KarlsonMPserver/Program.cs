@@ -1,4 +1,7 @@
-﻿using System;
+﻿// define logs (they can be removed)
+#define LOG_SCENE_ENTRY
+
+using System;
 using System.Threading;
 
 namespace KarlsonMPserver
@@ -11,7 +14,7 @@ namespace KarlsonMPserver
         {
             Console.Title = "KarlsonMP Server";
             isRunning = true;
-            Thread mainThread = new Thread(new ThreadStart(MainThread));
+            Thread mainThread = new(new ThreadStart(MainThread));
             mainThread.Start();
             Server.Start(11337, 10);
         }
