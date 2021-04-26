@@ -11,13 +11,15 @@ namespace KarlsonMP
     {
         public OnlinePlayer(int _id)
         {
+            id = _id;
             enemy = PrefabInstancer.CreateEnemy();
-            ClientSend.GetPlayerInfo(_id);
+            ClientSend.GetPlayerInfo(id);
         }
 
         public GameObject enemy;
         public string username;
         public Vector3 pos;
         public float rot;
+        public int id;
     }
 }

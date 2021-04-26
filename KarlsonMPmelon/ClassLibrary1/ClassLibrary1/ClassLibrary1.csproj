@@ -34,8 +34,8 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\..\karlson modding\mp MelonLoader\Karlson_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="MelonLoader.ModHandler">
-      <HintPath>..\..\..\..\..\karlson modding\mp MelonLoader\MelonLoader\MelonLoader.ModHandler.dll</HintPath>
+    <Reference Include="MelonLoader">
+      <HintPath>..\..\..\..\..\karlson modding\noway\MelonLoader\MelonLoader.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

@@ -12,16 +12,8 @@ namespace KarlsonMP
 {
     public class Main : MelonMod
     {
-        bool firstLaunch = true;
-
-        public override void OnLevelWasLoaded(int level)
+        public override void OnApplicationLateStart()
         {
-            if (!firstLaunch)
-                return;
-            if (level == 0)
-                return; // Scene `Initialize`, we want to hook in `MainMenu`
-            firstLaunch = false;
-            SceneManager.sceneLoaded += OnSceneLoaded;
             if (Client.instance == null)
             {
                 Client.instance = new Client();
@@ -30,12 +22,17 @@ namespace KarlsonMP
             usernameField = DataSave.Load(); // returns username, and loads ip history
             if (DataSave.IpHistory.Count > 0)
                 ipField = DataSave.IpHistory.Last(); // load last connected to ip
-            SceneManager.LoadScene("0Tutorial");
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
         private static string oldScene = "";
         static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            if(scene.name == "MainMenu" && !PrefabInstancer.Initialized)
+            {
+                SceneManager.LoadScene("0Tutorial");
+                return;
+            }
             if (scene.name == "0Tutorial" && !PrefabInstancer.Initialized)
             {
                 PrefabInstancer.LoadPrefabs();
@@ -67,7 +64,7 @@ namespace KarlsonMP
 				{
 					historyShown = !historyShown;
 				}
-				string connButtonStr = "Connect";
+				string connButtonStr = "Connect"; // button doesn't work for some reason 
 				if (Client.instance.isConnected)
 					connButtonStr = "Leave";
 				if (Client.instance.isConnecting)
@@ -102,7 +99,10 @@ namespace KarlsonMP
 			}
 			if(Client.instance.isConnected && SceneManager.GetActiveScene().buildIndex >= 2)
             {
-
+                foreach(OnlinePlayer player in Client.instance.players.Values)
+                {
+                    GUI.Box(new Rect(Camera.main.WorldToScreenPoint(player.pos).x, Camera.main.WorldToScreenPoint(player.pos).y, 100f, 50f), "(" + player.id + ") " + player.username);
+                }
             }
         }
 

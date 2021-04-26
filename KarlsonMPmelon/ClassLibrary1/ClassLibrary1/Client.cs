@@ -4,12 +4,13 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine.SceneManagement;
 
 namespace KarlsonMP
 {
     class Client
     {
-        public static Client instance;
+        public static Client instance = null;
         const int dataBufferSize = 4096;
 
         public string ip = "127.0.0.1";
