@@ -12,8 +12,15 @@ namespace KarlsonMP
 {
     public class Main : MelonMod
     {
-        public override void OnApplicationStart()
+        bool firstLaunch = true;
+
+        public override void OnLevelWasLoaded(int level)
         {
+            if (!firstLaunch)
+                return;
+            if (level == 0)
+                return; // Scene `Initialize`, we want to hook in `MainMenu`
+            firstLaunch = false;
             SceneManager.sceneLoaded += OnSceneLoaded;
             if (Client.instance == null)
             {
@@ -29,7 +36,6 @@ namespace KarlsonMP
         private static string oldScene = "";
         static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            // we only need to send to the server entering/leaving levels
             if (scene.name == "0Tutorial" && !PrefabInstancer.Initialized)
             {
                 PrefabInstancer.LoadPrefabs();
@@ -37,6 +43,7 @@ namespace KarlsonMP
             }
             if (Client.instance.isConnected)
                 Client.instance.players.Clear();
+            // we only need to send to the server entering/leaving levels
             if (oldScene != "" && oldScene != "Initialize" && oldScene != "MainMenu" && Client.instance.isConnected)
                 ClientSend.LeaveScene(oldScene);
             if (scene.name != "Initialize" && scene.name != "MainMenu" && Client.instance.isConnected)
@@ -49,7 +56,6 @@ namespace KarlsonMP
         private static bool historyShown = false;
         public override void OnGUI()
         {
-            GUI.Label(new Rect(0f, 0f, 1000f, 1000f), "<size=30><b>WORK FFS</b></size>");
             if (SceneManager.GetActiveScene().name == "MainMenu" || UIManger.Instance.deadUI.activeSelf || UIManger.Instance.winUI.activeSelf)
 			{
 				GUI.Box(new Rect(Screen.width / 2 - 150f, Screen.height - 40f, 300f, 40f), "");
