@@ -101,8 +101,26 @@ namespace KarlsonMP
             {
                 foreach(OnlinePlayer player in Client.instance.players.Values)
                 {
-                    GUI.Box(new Rect(Camera.main.WorldToScreenPoint(player.pos).x, Camera.main.WorldToScreenPoint(player.pos).y, 100f, 50f), "(" + player.id + ") " + player.username);
+                    string text = "(" + player.id + ") " + player.username;
+                    
+                    Vector3 pos = Camera.main.WorldToScreenPoint(player.pos + new Vector3(0f, 2.5f, 0f));
+                    if (Vector3.Distance(player.pos, PlayerMovement.Instance.transform.position) >= 150f)
+                        continue; // player is too far
+                    if (pos.z < 0)
+                        continue; // point is behind our camera
+                    Vector2 textSize = GUI.skin.label.CalcSize(new GUIContent(text));
+                    textSize.x += 10f;
+                    GUI.Box(new Rect(pos.x - textSize.x / 2, (Screen.height - pos.y) - textSize.y / 2, textSize.x, textSize.y), text);
                 }
+                /*foreach(Enemy enemy in UnityEngine.Object.FindObjectsOfType<Enemy>())
+                { // used for debugging, left it here :D
+                    Vector3 pos = Camera.main.WorldToScreenPoint(enemy.transform.position);
+                    if (pos.z < 0)
+                        continue; // point is behind our camera
+                    Vector2 textSize = GUI.skin.label.CalcSize(new GUIContent("enemy"));
+                    textSize.x += 10f;
+                    GUI.Box(new Rect(pos.x - textSize.x/2, (Screen.height - pos.y) - textSize.y/2, textSize.x, textSize.y), "enemy");
+                }*/
             }
         }
 
