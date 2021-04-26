@@ -51,6 +51,7 @@ namespace KarlsonMP
         private static string usernameField = "";
         private static string ipField = "";
         private static bool historyShown = false;
+        private static Vector2 ipHistoryScroll = Vector2.zero;
         public override void OnGUI()
         {
             if (SceneManager.GetActiveScene().name == "MainMenu" || UIManger.Instance.deadUI.activeSelf || UIManger.Instance.winUI.activeSelf)
@@ -91,10 +92,34 @@ namespace KarlsonMP
 					Client.instance.port = port;
 					Client.instance.username = usernameField;
 					Client.instance.ConnectToServer();
+                    DataSave.AddToList(ipField);
+                    DataSave.Save(usernameField);
 				}
 				if(historyShown)
                 {
-					// TODO: add history list (I already have something like this, just need to port it)
+                    GUI.Box(new Rect(Screen.width / 2 - 130f, Screen.height - 340f, 200f, 300f), "");
+                    GUI.BeginScrollView(new Rect(Screen.width / 2 - 130f, Screen.height - 340f, 200f, 300f), ipHistoryScroll, new Rect(0f, 0f, 200f, DataSave.IpHistory.Count * 50f));
+                    int i = 0;
+                    GUIStyle ipButton = new GUIStyle();
+                    ipButton.normal.background = Texture2D.blackTexture;
+                    ipButton.alignment = TextAnchor.MiddleLeft;
+                    ipButton.fontSize = 20;
+                    foreach(string _ip in DataSave.IpHistory.ToArray().Reverse())
+                    {
+                        string color = "<color=white>";
+                        if (ipField == _ip)
+                            color = "<color=green>";
+                        if(GUI.Button(new Rect(0f, i * 50f, 140f, 40f), color + _ip + "</color>"))
+                            ipField = _ip;
+                        if (GUI.Button(new Rect(140f, i * 50f, 60f, 20f), "<color=red>Remove</color>"))
+                            DataSave.Remove(DataSave.IpHistory.Count - 1 - i); // we fliped the list when showing it, we need to shout count - 1 - i | count - 1 => last index, - i => flips it, last being first, first being last
+                        if (GUI.Button(new Rect(140f, i * 50f + 20f, 30f, 20f), "▲"))
+                            DataSave.MoveUp(DataSave.IpHistory.Count - 1 - i); // see comment above
+                        if (GUI.Button(new Rect(170f, i * 50f + 20f, 30f, 20f), "▼"))
+                            DataSave.MoveDown(DataSave.IpHistory.Count - 1 - i); // see comment above
+                        i++;
+                    }
+                    GUI.EndScrollView(true);
                 }
 			}
 			if(Client.instance.isConnected && SceneManager.GetActiveScene().buildIndex >= 2)
@@ -103,7 +128,7 @@ namespace KarlsonMP
                 {
                     string text = "(" + player.id + ") " + player.username;
                     
-                    Vector3 pos = Camera.main.WorldToScreenPoint(player.pos + new Vector3(0f, 2.5f, 0f));
+                    Vector3 pos = Camera.main.WorldToScreenPoint(player.pos + new Vector3(0f, 2.0f, 0f));
                     if (Vector3.Distance(player.pos, PlayerMovement.Instance.transform.position) >= 150f)
                         continue; // player is too far
                     if (pos.z < 0)
@@ -112,15 +137,6 @@ namespace KarlsonMP
                     textSize.x += 10f;
                     GUI.Box(new Rect(pos.x - textSize.x / 2, (Screen.height - pos.y) - textSize.y / 2, textSize.x, textSize.y), text);
                 }
-                /*foreach(Enemy enemy in UnityEngine.Object.FindObjectsOfType<Enemy>())
-                { // used for debugging, left it here :D
-                    Vector3 pos = Camera.main.WorldToScreenPoint(enemy.transform.position);
-                    if (pos.z < 0)
-                        continue; // point is behind our camera
-                    Vector2 textSize = GUI.skin.label.CalcSize(new GUIContent("enemy"));
-                    textSize.x += 10f;
-                    GUI.Box(new Rect(pos.x - textSize.x/2, (Screen.height - pos.y) - textSize.y/2, textSize.x, textSize.y), "enemy");
-                }*/
             }
         }
 

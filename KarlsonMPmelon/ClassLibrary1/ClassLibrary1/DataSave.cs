@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using UnityEngine;
 
 namespace KarlsonMP
@@ -13,7 +15,7 @@ namespace KarlsonMP
         {
             if (PlayerPrefs.HasKey("KarlsonMP_ipHistory"))
             {
-                IpHistory = SaveManager.Instance.Deserialize<string[]>(PlayerPrefs.GetString("KarlsonMP_ipHistory")).ToList();
+                IpHistory = Deserialize<string[]>(PlayerPrefs.GetString("KarlsonMP_ipHistory")).ToList();
                 return PlayerPrefs.GetString("KarlsonMP_username");
             }
             return "";
@@ -22,7 +24,7 @@ namespace KarlsonMP
 
         public static void Save(string username)
         {
-            PlayerPrefs.SetString("KarlsonMP_ipHistory", SaveManager.Instance.Serialize<string[]>(IpHistory.ToArray()));
+            PlayerPrefs.SetString("KarlsonMP_ipHistory", Serialize(IpHistory.ToArray()));
             PlayerPrefs.SetString("KarlsonMP_username", username);
         }
 
@@ -59,6 +61,21 @@ namespace KarlsonMP
         public static void Remove(int index)
         {
             IpHistory.Remove(IpHistory[index]);
+        }
+
+        private static T Deserialize<T>(string toDeserialize)
+        {
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
+            StringReader textReader = new StringReader(toDeserialize);
+            return (T)((object)xmlSerializer.Deserialize(textReader));
+        }
+
+        private static string Serialize<T>(T toSerialize)
+        {
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
+            StringWriter stringWriter = new StringWriter();
+            xmlSerializer.Serialize(stringWriter, toSerialize);
+            return stringWriter.ToString();
         }
     }
 }

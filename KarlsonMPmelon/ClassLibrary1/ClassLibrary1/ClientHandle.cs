@@ -38,6 +38,13 @@ namespace KarlsonMP
             {
                 int _id = _packet.ReadInt();
                 clients += _id + ", ";
+                if(Client.instance.players.ContainsKey(_id))
+                {
+                    if (Client.instance.players[_id].enemy)
+                        UnityEngine.Object.Destroy(Client.instance.players[_id].enemy);
+                    Client.instance.players.Remove(_id);
+                }
+                    
                 Client.instance.players.Add(_id, new OnlinePlayer(_id));
             }
             UnityEngine.Debug.Log($"There are {_len} clients in our scene ({clients})");

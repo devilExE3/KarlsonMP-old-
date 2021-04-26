@@ -92,6 +92,10 @@ namespace KarlsonMPserver
                                       where x.Value.tcp.socket != null && x.Value.player != null
                                       select x.Value)
             {
+                if (client.player == null)
+                    continue;
+                if (Server.clients[_fromClient].player == null)
+                    continue;
                 if(client.player.scene == Server.clients[_fromClient].player.scene && client.id != _fromClient)
                     ServerSend.ClientMove(client.id, _fromClient, pos, _rot);
             }
