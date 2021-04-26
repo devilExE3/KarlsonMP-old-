@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <RuntimeIdentifiers>win10-x64;linux-x64</RuntimeIdentifiers>
     <TargetFramework>net5.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>server</AssemblyName>
   </PropertyGroup>
-
 </Project>

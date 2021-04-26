@@ -1,0 +1,1 @@
+dotnet publish -c release -o ./windows-build -r win10-x64 ./KarlsonMPserver/KarlsonMPserver.csproj

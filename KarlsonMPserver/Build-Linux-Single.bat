@@ -1,0 +1,1 @@
+dotnet publish -c release -o ./linux-build -r linux-x64 --no-self-contained /p:PublishSingleFile=true ./KarlsonMPserver/KarlsonMPserver.csproj
