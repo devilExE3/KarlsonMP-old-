@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KarlsonMPclient
+namespace KarlsonMP
 {
     class ClientHandle
     {
@@ -34,7 +34,7 @@ namespace KarlsonMPclient
         {
             int _len = _packet.ReadInt();
             string clients = "";
-            for(int i = 0; i < _len; i++)
+            for (int i = 0; i < _len; i++)
             {
                 int _id = _packet.ReadInt();
                 clients += _id + ", ";
@@ -42,7 +42,7 @@ namespace KarlsonMPclient
             }
             UnityEngine.Debug.Log($"There are {_len} clients in our scene ({clients})");
         }
-        
+
         public static void ClientInfo(Packet _packet)
         {
             int _id = _packet.ReadInt();

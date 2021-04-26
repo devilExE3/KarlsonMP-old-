@@ -83,6 +83,7 @@
     <Compile Include="DataSave.cs" />
     <Compile Include="HarmonyHooks.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="ModProxy.cs" />
     <Compile Include="OnlinePlayer.cs" />
     <Compile Include="Packet.cs" />
     <Compile Include="PosSender.cs" />

@@ -84,7 +84,8 @@ namespace KarlsonMPserver
                     {
                         Packet _packet = new(_packetBytes);
                         int _packetId = _packet.ReadInt();
-                        Server.packetHandlers[_packetId](id, _packet);
+                        if(Server.packetHandlers.ContainsKey(_packetId))
+                            Server.packetHandlers[_packetId](id, _packet);
                     });
 
                     _packetLength = 0;

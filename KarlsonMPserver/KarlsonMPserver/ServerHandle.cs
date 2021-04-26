@@ -90,10 +90,11 @@ namespace KarlsonMPserver
             float _rot = _packet.ReadFloat();
             foreach (Client client in from x in Server.clients
                                       where x.Value.tcp.socket != null && x.Value.player != null
-                                         && x.Value.player.scene == Server.clients[_fromClient].player.scene
-                                         && x.Value.id != _fromClient
                                       select x.Value)
-                ServerSend.ClientMove(client.id, _fromClient, pos, _rot);
+            {
+                if(client.player.scene == Server.clients[_fromClient].player.scene && client.id != _fromClient)
+                    ServerSend.ClientMove(client.id, _fromClient, pos, _rot);
+            }
         }
     }
 }

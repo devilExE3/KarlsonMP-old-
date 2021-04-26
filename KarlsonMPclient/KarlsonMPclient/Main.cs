@@ -1,21 +1,19 @@
-﻿using modloader;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Net;
-using System.Collections.Generic;
 using System.Linq;
+using HarmonyLib;
 
 namespace KarlsonMPclient
 {
-    [ModInfo(GUID, "KarlsonMP", "devilExE", "a1.0")]
-    public class Main : IMod
+    
+    public class Main
     {
+		public static string test = "test";
+
 		public const string GUID = "me.devilexe.karlsonmp";
-		public static Main Instance { get; private set; }
-		public static HarmonyLib.Harmony Harmony;
-        public void Start()
+		public static Harmony Harmony;
+        public static void Start()
         {
-			Instance = this;
 			SceneManager.sceneLoaded += OnSceneLoaded;
 			if(Client.instance == null)
             {
@@ -25,14 +23,14 @@ namespace KarlsonMPclient
 			usernameField = DataSave.Load(); // returns username, and loads ip history
 			if (DataSave.IpHistory.Count > 0)
 				ipField = DataSave.IpHistory.Last(); // load last connected to ip
-			SceneManager.LoadScene("0Tutorial");
-			Harmony = new HarmonyLib.Harmony(GUID);
-			Harmony.PatchAll();
+			//SceneManager.LoadScene("0Tutorial");
+			Harmony = new Harmony(GUID);
+			Harmony.Patch(typeof(Enemy).GetMethod("LateUpdate"), prefix: new HarmonyMethod(typeof(HarmonyHooks).GetMethod("Enemy_LateUpdate")));
 		}
 
-		private string oldScene = "";
+		private static string oldScene = "";
 
-		void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+		static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
 		{
 			// we only need to send to the server entering/leaving levels
 			if (scene.name == "0Tutorial" && !PrefabInstancer.initialized)
@@ -49,9 +47,10 @@ namespace KarlsonMPclient
 			oldScene = scene.name;
 		}
 
-		public void OnGUI()
+		public static void OnGUI()
         {
-			if (SceneManager.GetActiveScene().name == "MainMenu" || UIManger.Instance.deadUI.activeSelf || UIManger.Instance.winUI.activeSelf)
+			GUI.Label(new Rect(0f, 0f, 1000f, 1000f), "<size=30><b>WORK FFS</b></size>");
+			/*if (SceneManager.GetActiveScene().name == "MainMenu" || UIManger.Instance.deadUI.activeSelf || UIManger.Instance.winUI.activeSelf)
 			{
 				GUI.Box(new Rect(Screen.width / 2 - 150f, Screen.height - 40f, 300f, 40f), "");
 				GUI.Label(new Rect(Screen.width / 2 - 150f, Screen.height - 40f, 300f, 40f), "Username");
@@ -95,18 +94,22 @@ namespace KarlsonMPclient
 					// TODO: add history list (I already have something like this, just need to port it)
                 }
 			}
+			if(Client.instance.isConnected && SceneManager.GetActiveScene().buildIndex >= 2)
+            {
+
+            }*/
 		}
 
-		private string usernameField = "";
-		private string ipField = "";
-		private bool historyShown = false;
+		private static string usernameField = "";
+		private static string ipField = "";
+		private static bool historyShown = false;
 
-		public void Update(float deltaTime) {
+		public static void Update(float deltaTime) {
 			ThreadManager.UpdateMain();
 			PosSender.Update();
 		}
-        public void FixedUpdate(float fixedDeltaTime) { }
-        public void OnApplicationQuit()
+        public static void FixedUpdate(float fixedDeltaTime) { }
+        public static void OnApplicationQuit()
 		{
 			Client.instance.Disconnect();
 		}
