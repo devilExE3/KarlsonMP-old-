@@ -263,28 +263,65 @@ namespace KarlsonMP
                     GUI.Box(new Rect(pos.x - textSize.x / 2, (Screen.height - pos.y) - textSize.y / 2, textSize.x, textSize.y), text);
                 }
             }
-            GUI.Label(new Rect(2f, 20f, Screen.width, Screen.height), chat);
             if (isChatOpened)
             {
                 GUI.SetNextControlName("chatfield");
-                chatField = GUI.TextArea(new Rect(2f, 0f, 400f, 20f), chatField);
+                chatField = GUI.TextArea(new Rect(0f, Screen.height-20f, 400f, 20f), chatField);
                 GUI.FocusControl("chatfield");
-                if (chatField.EndsWith("\n")) // pressed return
+                if (chatField.Contains("\n")) // pressed return
                 {
+                    if(chatField.StartsWith("/"))
+                    {
+                        if(chatField.Trim().ToLower() == "/c")
+                        {
+                            if (Cursor.visible)
+                            {
+                                Cursor.visible = false;
+                                Cursor.lockState = CursorLockMode.Locked;
+                            }
+                            else
+                            {
+                                Cursor.visible = true;
+                                Cursor.lockState = CursorLockMode.None;
+                            }
+                        }
+                        if(chatField.Trim().ToLower() == "/cc")
+                        {
+                            chat = "";
+                        }
+                        isChatOpened = false;
+                        return;
+                    }
                     if (chatField.Trim().Length > 0)
-                        ClientSend.ChatMsg(chatField.Trim());
+                        ClientSend.ChatMsg(chatField.Replace("\n", "").Trim());
                     isChatOpened = false;
                 }
-                if (chatField.EndsWith("`"))
+                if (chatField.Contains("`"))
                     isChatOpened = false;
+            }
+            if (lastSentMessage < 11f || isChatOpened)
+            {
+                GUIStyle alpha = new GUIStyle();
+                if (lastSentMessage > 10f && !isChatOpened)
+                {
+                    alpha.normal.textColor = new Color(255f, 255f, 255f, 11f - lastSentMessage);
+                    alpha.normal.background. = new Color(255f, 255f, 255f, 11f - lastSentMessage);
+                }
+                else
+                    alpha.normal.textColor = Color.white;
+                GUI.Box(new Rect(0f, Screen.height - 300f, 400f, 300f), "");
+
             }
         }
 
+        private static float lastSentMessage = 0f;
+
         public static void AddToChat(string str)
         {
-            if (chat.Split('\n').Length > 30)
-                chat.Substring(chat.IndexOf('\n') + 1); // drops first line
+            while (chat.Split('\n').Length > 30)
+                chat = chat.Substring(chat.IndexOf('\n') + 1); // limit to 150 lines
             chat += str + "\n";
+            lastSentMessage = 0f;
         }
 
         private static bool firstWinFrame = false;

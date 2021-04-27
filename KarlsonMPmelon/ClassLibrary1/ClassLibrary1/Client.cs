@@ -86,7 +86,7 @@ namespace KarlsonMP
                 }
                 catch (Exception _ex)
                 {
-                    UnityEngine.Debug.LogError($"Error while receiving data: {_ex}");
+                    Main.AddToChat($"<color=red>Error while receiving data: {_ex}</color>");
                     Disconnect();
                 }
             }
@@ -134,7 +134,7 @@ namespace KarlsonMP
                 }
                 catch (Exception _ex)
                 {
-                    UnityEngine.Debug.LogError($"Error while sending data {_ex}");
+                    Main.AddToChat($"<color=red>Error while sending data {_ex}</color>");
                 }
             }
 
@@ -167,8 +167,9 @@ namespace KarlsonMP
             if (!isConnected)
                 return;
             isConnected = false;
+            isConnecting = false;
             tcp.socket.Close();
-            UnityEngine.Debug.Log("Disconnected from the server");
+            Main.AddToChat("Disconnected from the server");
         }
     }
 }

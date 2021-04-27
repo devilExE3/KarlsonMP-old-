@@ -13,10 +13,10 @@ namespace KarlsonMP
             int _id = _packet.ReadInt();
             string _msg = _packet.ReadString();
             Client.instance.myId = _id;
-            UnityEngine.Debug.Log($"Received welcome message: {_msg}");
             ClientSend.WelcomeReceived();
             Client.instance.isConnecting = false;
             Client.instance.isConnected = true;
+            Main.AddToChat($"Connected with ID {_id} | {_msg}");
         }
 
         public static void EnterScene(Packet _packet)
@@ -53,7 +53,6 @@ namespace KarlsonMP
                     
                 Client.instance.players.Add(_id, new OnlinePlayer(_id));
             }
-            UnityEngine.Debug.Log($"There are {_len} clients in our scene ({clients})");
         }
 
         public static void ClientInfo(Packet _packet)
@@ -61,7 +60,6 @@ namespace KarlsonMP
             int _id = _packet.ReadInt();
             string _username = _packet.ReadString();
             Client.instance.players[_id].username = _username;
-            UnityEngine.Debug.Log($"Received info for ID {_id}: username: {_username}");
         }
 
         public static void ClientMove(Packet _packet)
