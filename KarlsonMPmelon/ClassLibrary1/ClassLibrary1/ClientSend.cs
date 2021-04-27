@@ -60,5 +60,23 @@ namespace KarlsonMP
                 SendTCPData(_packet);
             }
         }
+
+        public static void ChatMsg(string _msg)
+        {
+            using (Packet _packet = new Packet((int)PacketID.chat))
+            {
+                _packet.Write(_msg);
+                SendTCPData(_packet);
+            }
+        }
+
+        public static void FinishLevel(int miliseconds)
+        {
+            using (Packet _packet = new Packet((int)PacketID.finishLevel))
+            {
+                _packet.Write(miliseconds);
+                SendTCPData(_packet);
+            }
+        }
     }
 }

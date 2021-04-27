@@ -158,6 +158,7 @@ namespace KarlsonMP
                 { (int)PacketID.clientsInScene, ClientHandle.ClientsInScene },
                 { (int)PacketID.clientInfo,     ClientHandle.ClientInfo },
                 { (int)PacketID.clientMove,     ClientHandle.ClientMove },
+                { (int)PacketID.chat,           ClientHandle.Chat },
             };
         }
 

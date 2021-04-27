@@ -22,6 +22,12 @@ namespace KarlsonMP
         public static void EnterScene(Packet _packet)
         {
             int _id = _packet.ReadInt();
+            if(Client.instance.players.ContainsKey(_id))
+            {
+                if (Client.instance.players[_id].enemy)
+                    UnityEngine.Object.Destroy(Client.instance.players[_id].enemy);
+                Client.instance.players.Remove(_id);
+            }
             Client.instance.players.Add(_id, new OnlinePlayer(_id));
         }
         public static void LeaveScene(Packet _packet)
@@ -72,6 +78,11 @@ namespace KarlsonMP
             Client.instance.players[_id].rot = _rot;
             Client.instance.players[_id].enemy.transform.position = pos + new UnityEngine.Vector3(0f, 1.4f, 0f); // pos correction
             Client.instance.players[_id].enemy.transform.rotation = UnityEngine.Quaternion.Euler(0f, _rot, 0f);
+        }
+
+        public static void Chat(Packet _packet)
+        {
+            Main.AddToChat(_packet.ReadString());
         }
     }
 }

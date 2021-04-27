@@ -22,6 +22,14 @@ namespace KarlsonMPserver
                 Server.clients[_client].tcp.SendData(_packet.ToArray());
         }
 
+        private static void SendTCPData(Packet _packet)
+        {
+            _packet.WriteLength();
+            for (int i = 1; i <= Server.MaxPlayers; i++)
+                if (Server.clients[i].tcp.socket != null)
+                    Server.clients[i].tcp.SendData(_packet.ToArray());
+        }
+
         public static void Welcome(int _toClient, string _msg)
         {
             using Packet _packet = new((int)PacketID.welcome);
@@ -73,6 +81,19 @@ namespace KarlsonMPserver
             _packet.Write(_pos);
             _packet.Write(_rot);
             SendTCPData(_toClient, _packet);
+        }
+
+        public static void Chat(int _toClient, string _message)
+        {
+            using Packet _packet = new((int)PacketID.chat);
+            _packet.Write(_message);
+            SendTCPData(_toClient, _packet);
+        }
+        public static void Chat(string _message)
+        {
+            using Packet _packet = new((int)PacketID.chat);
+            _packet.Write(_message);
+            SendTCPData(_packet);
         }
     }
 }

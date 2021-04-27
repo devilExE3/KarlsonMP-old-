@@ -23,18 +23,12 @@ namespace KarlsonMPserver
             Server.clients[_fromClient].player = new Player(_fromClient, _username);
         }
 
-        private static readonly string[] allowedSceneNames = new string[]
-        {
-            "0Tutorial",
-            "1Sandbox0", "2Sandbox1", "3Sandbox2",
-            "4Escape0", "5Escape1", "6Escape2", "7Escape3",
-            "8Sky0", "9Sky1", "10Sky2"
-        };
+        
 
         public static void EnterScene(int _fromClient, Packet _packet)
         {
             string _sceneName = _packet.ReadString();
-            if (!allowedSceneNames.Contains(_sceneName))
+            if (!Constants.allowedSceneNames.Contains(_sceneName))
                 // TODO: maybe drop client, because he entered a scene that doesn't exist in the normal
                 // version (or a scene we don't care about entering, such as Initialization and MainMenu)
                 return;
@@ -51,14 +45,13 @@ namespace KarlsonMPserver
                                      select x.Value)
                 ServerSend.EnterScene(client.id, _fromClient);
             ServerSend.ClientsInScene(_fromClient, _sceneName);
-            Console.WriteLine($"ID {_fromClient} entered scene {_sceneName}");
             Server.clients[_fromClient].player.scene = _sceneName;
         }
 
         public static void LeaveScene(int _fromClient, Packet _packet)
         {
             string _sceneName = _packet.ReadString();
-            if (!allowedSceneNames.Contains(_sceneName))
+            if (!Constants.allowedSceneNames.Contains(_sceneName))
                 // TODO: maybe drop client, because he entered a scene that doesn't exist in the normal
                 // version (or a scene we don't care about entering, such as Initialization and MainMenu)
                 return;
@@ -75,7 +68,6 @@ namespace KarlsonMPserver
                                          && x.Value.player.scene == _sceneName
                                       select x.Value)
                 ServerSend.LeaveScene(client.id, _fromClient);
-            Console.WriteLine($"ID {_fromClient} left scene {_sceneName}");
         }
 
         public static void GetClientInfo(int _fromClient, Packet _packet)
@@ -99,6 +91,21 @@ namespace KarlsonMPserver
                 if(client.player.scene == Server.clients[_fromClient].player.scene && client.id != _fromClient)
                     ServerSend.ClientMove(client.id, _fromClient, pos, _rot);
             }
+        }
+
+        public static void Chat(int _fromClient, Packet _packet)
+        {
+            string _msg = _packet.ReadString();
+            // handle commands ?
+            ServerSend.Chat(Server.clients[_fromClient].player.username + ": " + _msg);
+        }
+
+        public static void FinishLevel(int _fromClient, Packet _packet)
+        {
+            if (Server.clients[_fromClient].player.scene == "")
+                return; // client isn't in any scene that we know of
+            int miliseconds = _packet.ReadInt();
+            ServerSend.Chat("<b>*</b> " + Server.clients[_fromClient].player.username + " finished " + Constants.sceneNames[Constants.allowedSceneNames.ToList().IndexOf(Server.clients[_fromClient].player.scene)] + " in " + Constants.FormatMiliseconds(miliseconds));
         }
     }
 }

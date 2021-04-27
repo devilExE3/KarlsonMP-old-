@@ -27,12 +27,17 @@ namespace KarlsonMP
             PlayerPrefs.SetString("KarlsonMP_ipHistory", Serialize(IpHistory.ToArray()));
             PlayerPrefs.SetString("KarlsonMP_username", username);
         }
+        public static void Save()
+        {
+            PlayerPrefs.SetString("KarlsonMP_ipHistory", Serialize(IpHistory.ToArray()));
+        }
 
         public static void AddToList(string ip)
         {
             if (IpHistory.Contains(ip))
                 IpHistory.Remove(ip); // makes sure that this ip is on top
             IpHistory.Add(ip);
+            Save();
         }
 
         /*
@@ -47,6 +52,7 @@ namespace KarlsonMP
             string toMove = IpHistory[index];
             IpHistory.Remove(toMove);
             IpHistory.Insert(index + 1, toMove);
+            Save();
         }
 
         public static void MoveDown(int index) // this moves the ip one index lower
@@ -56,11 +62,13 @@ namespace KarlsonMP
             string toMove = IpHistory[index - 1];
             IpHistory.Remove(toMove);
             IpHistory.Insert(index, toMove); // move the ip below one slot higher
+            Save();
         }
 
         public static void Remove(int index)
         {
             IpHistory.Remove(IpHistory[index]);
+            Save();
         }
 
         private static T Deserialize<T>(string toDeserialize)

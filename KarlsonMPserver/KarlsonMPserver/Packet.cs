@@ -39,10 +39,20 @@ namespace KarlsonMPserver
         /// </summary>
         clientInfo,
         /// <summary>
-        /// server: Send a new player's pos that is in our scene
+        /// server: Send a new player's pos that is in our scene |
         /// client: Send the server our new pos
         /// </summary>
         clientMove,
+        /// <summary>
+        /// server: Write a new line to the chat |
+        /// client: send a message / command
+        /// </summary>
+        chat,
+        /// <summary>
+        /// server: - |
+        /// client: tell the server we finished a level
+        /// </summary>
+        finishLevel,
     }
 
     public class Packet : IDisposable
