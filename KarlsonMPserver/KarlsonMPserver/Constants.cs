@@ -8,7 +8,7 @@ namespace KarlsonMPserver
 {
     class Constants
     {
-        public const string version = "Official backup server";
+        public const string version = "Official primary server";
         public const int TPS = 30;
         public const int MS_PER_TICK = 1000 / TPS;
 

@@ -299,29 +299,13 @@ namespace KarlsonMP
                 if (chatField.Contains("`"))
                     isChatOpened = false;
             }
-            if (lastSentMessage < 11f || isChatOpened)
-            {
-                GUIStyle alpha = new GUIStyle();
-                if (lastSentMessage > 10f && !isChatOpened)
-                {
-                    alpha.normal.textColor = new Color(255f, 255f, 255f, 11f - lastSentMessage);
-                    alpha.normal.background. = new Color(255f, 255f, 255f, 11f - lastSentMessage);
-                }
-                else
-                    alpha.normal.textColor = Color.white;
-                GUI.Box(new Rect(0f, Screen.height - 300f, 400f, 300f), "");
-
-            }
         }
-
-        private static float lastSentMessage = 0f;
 
         public static void AddToChat(string str)
         {
             while (chat.Split('\n').Length > 30)
                 chat = chat.Substring(chat.IndexOf('\n') + 1); // limit to 150 lines
             chat += str + "\n";
-            lastSentMessage = 0f;
         }
 
         private static bool firstWinFrame = false;
