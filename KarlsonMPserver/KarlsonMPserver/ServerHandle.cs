@@ -13,6 +13,7 @@ namespace KarlsonMPserver
         {
             int _checkId = _packet.ReadInt();
             string _username = _packet.ReadString();
+            _username = Utils.RemoveRichText(_username);
             string _version = "0.0.0";
             try
             {
@@ -115,7 +116,7 @@ namespace KarlsonMPserver
         {
             string _msg = _packet.ReadString();
             // handle commands ?
-            ServerSend.Chat(Server.clients[_fromClient].player.username + ": " + _msg);
+            ServerSend.Chat(Utils.RemoveRichText(Server.clients[_fromClient].player.username + ": " + _msg));
         }
 
         public static void FinishLevel(int _fromClient, Packet _packet)
