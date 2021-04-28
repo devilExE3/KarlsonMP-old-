@@ -5,7 +5,7 @@ using HarmonyLib;
 
 namespace KarlsonMP
 {
-    /*[HarmonyPatch(typeof(Enemy), "LateUpdate")]
+    [HarmonyPatch(typeof(Enemy), "LateUpdate")]
     public static class Enemy_LateUpdate
     {
         public static bool Prefix(Enemy __instance)
@@ -31,14 +31,14 @@ namespace KarlsonMP
             }
             return false;
         }
-    }*/
+    }
 
-    [HarmonyPatch]
+    /*[HarmonyPatch]
     class Enemy_LateUpdate
     {
         static System.Reflection.MethodBase TargetMethod()
         {
-            return typeof(Enemy).GetMethod("LateUpdate").MakeGenericMethod();
+            return typeof(Enemy).GetMethod("LateUpdate");
         }
         static bool Prefix(Enemy __instance)
         {
@@ -53,7 +53,7 @@ namespace KarlsonMP
     {
         static System.Reflection.MethodBase TargetMethod()
         {
-            return typeof(Debug).GetMethod("Update").MakeGenericMethod();
+            return typeof(Debug).GetMethod("Update");
         }
         static bool Prefix(Debug __instance)
         {
@@ -67,5 +67,5 @@ namespace KarlsonMP
             }
             return false;
         }
-    }
+    }*/
 }
