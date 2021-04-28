@@ -8,10 +8,8 @@ namespace KarlsonMPserver
 {
     class Constants
     {
-        public const string motd = "Official primary server";
+        // constants
         public const string version = "1.0.2";
-        public const int TPS = 30;
-        public const int MS_PER_TICK = 1000 / TPS;
 
         public static readonly string[] allowedSceneNames = new string[]
         {
@@ -35,10 +33,9 @@ namespace KarlsonMPserver
             int _seconds = _miliseconds % 60;
             _miliseconds /= 60;
             int _minutes = _miliseconds % 60;
-            string.Format("%2d");
-            return twodigit(_minutes) + ":" + twodigit(_seconds) + ":" + twodigit(_ms / 10);
+            return Twodigit(_minutes) + ":" + Twodigit(_seconds) + ":" + Twodigit(_ms / 10);
         }
-        private static string twodigit(int i)
+        private static string Twodigit(int i)
         {
             if (i < 10)
                 return "0" + i;

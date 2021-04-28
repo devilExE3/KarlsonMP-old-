@@ -73,6 +73,11 @@ namespace KarlsonMP
 
             private void ReceiveCallback(IAsyncResult ar)
             {
+                if (stream == null)
+                {
+                    Disconnect();
+                    return;
+                }
                 try
                 {
                     int _byteLength = stream.EndRead(ar);
@@ -142,6 +147,8 @@ namespace KarlsonMP
 
             public void Disconnect()
             {
+                if (socket == null)
+                    return;
                 instance.Disconnect();
                 stream = null;
                 receiveBuffer = null;

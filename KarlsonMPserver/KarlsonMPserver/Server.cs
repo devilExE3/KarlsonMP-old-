@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using System.IO;
 
 namespace KarlsonMPserver
 {
@@ -34,13 +35,13 @@ namespace KarlsonMPserver
             listener = new TcpListener(IPAddress.Any, Port);
             listener.Start();
             listener.BeginAcceptTcpClient(TCPConnectCallback, null);
-            Console.WriteLine($"Server listening for connections on *:{Port}");
+            Program.Log($"Server listening for connections on *:{Port}");
         }
         private static void TCPConnectCallback(IAsyncResult ar)
         {
             TcpClient _client = listener.EndAcceptTcpClient(ar);
             listener.BeginAcceptTcpClient(TCPConnectCallback, null);
-            Console.WriteLine($"Incoming connection from {_client.Client.RemoteEndPoint}");
+            Program.Log($"Incoming connection from {_client.Client.RemoteEndPoint}");
             for(int i = 1; i <= MaxPlayers; i++)
                 if(clients[i].tcp.socket == null)
                 {

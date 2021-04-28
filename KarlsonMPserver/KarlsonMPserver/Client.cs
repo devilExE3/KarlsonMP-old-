@@ -42,7 +42,7 @@ namespace KarlsonMPserver
                 receivedData = new Packet();
                 receiveBuffer = new byte[dataBufferSize];
                 stream.BeginRead(receiveBuffer, 0, dataBufferSize, ReceiveCallback, null);
-                ServerSend.Welcome(id, Constants.motd);
+                ServerSend.Welcome(id, Program.config.motd);
             }
 
             private void ReceiveCallback(IAsyncResult ar)
@@ -67,7 +67,7 @@ namespace KarlsonMPserver
                 }
                 catch(Exception _ex)
                 {
-                    Console.WriteLine($"Error while receiving data: {_ex}");
+                    Program.Log($"Error while receiving data: {_ex}");
                     Server.clients[id].Disconnect();
                 }
             }
@@ -116,7 +116,7 @@ namespace KarlsonMPserver
                 }
                 catch(Exception _ex)
                 {
-                    Console.WriteLine($"Error while sending data: {_ex}");
+                    Program.Log($"Error while sending data: {_ex}");
                 }
             }
 
@@ -134,9 +134,10 @@ namespace KarlsonMPserver
 
         public void Disconnect()
         {
-            Console.WriteLine($"ID {id} has disconnected");
             if(player != null && player.scene != "")
             {
+                Program.Log($"ID {id} has disconnected");
+                ServerSend.Chat("<color=red>[-] <b>" + player.username + "</b></color>");
                 string old = player.scene;
                 player.scene = "";
                 foreach (Client client in from x in Server.clients

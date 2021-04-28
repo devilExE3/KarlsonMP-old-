@@ -20,26 +20,27 @@ namespace KarlsonMPserver
             }
             catch
             {
-                Console.WriteLine($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} outdated version {_version}");
+                Program.Log($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} outdated version {_version}");
                 ServerSend.Chat(_fromClient, "<color=red>You are running an older version of karlson.</color>");
                 Server.clients[_fromClient].Disconnect();
                 return;
             }
             if (_checkId != _fromClient)
             {
-                Console.WriteLine($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} assumed wrong ID {_checkId} (Sent from {_fromClient})");
+                Program.Log($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} assumed wrong ID {_checkId} (Sent from {_fromClient})");
                 Server.clients[_fromClient].Disconnect();
                 return;
             }
             if(_version != Constants.version)
             {
-                Console.WriteLine($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} outdated version {_version}");
+                Program.Log($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} outdated version {_version}");
                 ServerSend.Chat(_fromClient, "<color=red>You are running different version of KarlsonMP than the server.</color>\nPlease refer to api.xiloe.fr/karlson/status for more information");
                 Server.clients[_fromClient].Disconnect();
                 return;
             }
-            Console.WriteLine($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} connected with ID {_fromClient} and username {_username}");
+            Program.Log($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} connected with ID {_fromClient} and username {_username}");
             Server.clients[_fromClient].player = new Player(_fromClient, _username);
+            ServerSend.Chat("<color=green>[+] <b>" + _username + "</b></color>");
         }
 
         public static void EnterScene(int _fromClient, Packet _packet)
@@ -122,10 +123,10 @@ namespace KarlsonMPserver
             if (Server.clients[_fromClient].player.scene == "")
                 return; // client isn't in any scene that we know of
             int miliseconds = _packet.ReadInt();
-            ServerSend.Chat("<b>*</b> " + Server.clients[_fromClient].player.username + " finished " + Constants.sceneNames[Constants.allowedSceneNames.ToList().IndexOf(Server.clients[_fromClient].player.scene)] + " in " + Constants.FormatMiliseconds(miliseconds));
+            ServerSend.Chat("<color=yellow>* <b>" + Server.clients[_fromClient].player.username + "</b> finished <b>" + Constants.sceneNames[Constants.allowedSceneNames.ToList().IndexOf(Server.clients[_fromClient].player.scene)] + "</b> in " + Constants.FormatMiliseconds(miliseconds) + "</color>");
         }
 
-        public static void Ping(int _fromClient, Packet _packet)
+        public static void Ping(int _fromClient, Packet _)
         {
             Server.clients[_fromClient].player.ping = (int)(DateTime.Now - Server.clients[_fromClient].player.lastPing).TotalMilliseconds;
             Server.clients[_fromClient].player.lastPing = DateTime.MinValue;

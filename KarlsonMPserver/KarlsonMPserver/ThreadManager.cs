@@ -8,8 +8,8 @@ namespace KarlsonMPserver
 {
     class ThreadManager
     {
-        private static readonly List<Action> executeOnMainThread = new List<Action>();
-        private static readonly List<Action> executeCopiedOnMainThread = new List<Action>();
+        private static readonly List<Action> executeOnMainThread = new();
+        private static readonly List<Action> executeCopiedOnMainThread = new();
         private static bool actionToExecuteOnMainThread = false;
 
         /// <summary>Sets an action to be executed on the main thread.</summary>
@@ -18,7 +18,7 @@ namespace KarlsonMPserver
         {
             if (_action == null)
             {
-                Console.WriteLine("No action to execute on main thread!");
+                Program.Log("No action to execute on main thread!");
                 return;
             }
 
