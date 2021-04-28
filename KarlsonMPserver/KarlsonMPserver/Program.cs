@@ -19,7 +19,7 @@ namespace KarlsonMPserver
             public ServerConfig(string configFile)
             {
                 int line = 1;
-                foreach(var set in File.ReadAllText(configFile).Split('\n'))
+                foreach(var set in File.ReadAllText(configFile).Trim().Split('\n'))
                 {
                     string[] options = set.Split('=');
                     if(options.Length != 2)

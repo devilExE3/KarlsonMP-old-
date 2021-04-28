@@ -7,15 +7,18 @@ namespace KarlsonMP
 {
     class HarmonyHooks
     {
-        //[HarmonyPatch(typeof(Enemy), "LateUpdate")]
-        public static bool Enemy_LateUpdate(Enemy __instance)
+        [HarmonyPatch(typeof(Enemy), "LateUpdate")]
+        public class Enemy_LateUpdate
         {
-            if (__instance.IsDead())
-                return true;
-            return __instance.GetComponent<NavMeshAgent>().enabled; // LateUpdate cancels animations
+            public static bool Prefix(Enemy __instance)
+            {
+                if (__instance.IsDead())
+                    return false;
+                return __instance.GetComponent<NavMeshAgent>().enabled; // LateUpdate cancels animations
+            }
         }
 
-        //[HarmonyPatch(typeof(Debug), "Update")]
+        [HarmonyPatch(typeof(Debug), "Update")]
         public class Debug_Update
         {
             public static bool Prefix(Debug __instance)

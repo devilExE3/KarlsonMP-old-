@@ -39,7 +39,6 @@ namespace KarlsonMP
         private static string oldVer = string.Empty;
         private static string newVer = string.Empty;
         private static string changelog = string.Empty;
-        public static HarmonyLib.Harmony Harmony { get; private set; }
 
         private static string GetUpdateInfo()
         {
@@ -95,9 +94,6 @@ namespace KarlsonMP
             if (DataSave.IpHistory.Count > 0)
                 ipField = DataSave.IpHistory.Last(); // load last connected to ip
             SceneManager.sceneLoaded += OnSceneLoaded;
-            Harmony = new HarmonyLib.Harmony("me.devilexe.karlsonmp");
-            //Harmony.Patch(typeof(Enemy).GetMethod("LateUpdate"), prefix: new HarmonyLib.HarmonyMethod(typeof(HarmonyHooks).GetMethod("Enemy_LateUpdate")));
-            Harmony.PatchAll();
         }
 
         private void DownloadNewFile()
