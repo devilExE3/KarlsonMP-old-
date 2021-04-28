@@ -267,7 +267,22 @@ namespace KarlsonMP
                     if (message.StartsWith("/"))
                     {
                         bool succes = false; // we don't want to block every text with a `/`, we might add commands on the server as well
-                        if (message.ToLower() == "/c")
+                        string message = chatField.Replace("\n", "").Trim();
+                    if (message.StartsWith("/"))
+                    {
+                        bool success = false; // we don't want to block every text with a `/`, we might add commands on the server as well
+                        if (message.ToLower() == "/help" || message.ToLower() == "/h")
+                        {
+                            AddToChat("\n=========== Help - Commands ===========");
+                            AddToChat("<color=yellow>/help</color> or <color=yellow>/h</color> - Shows this message");
+                            AddToChat("<color=yellow>/cc</color> or <color=yellow>/clearchat</color> - Clear chat");
+                            AddToChat("<color=yellow>/c</color> or <color=yellow>/cursor</color> - Toggle cursor");
+                            AddToChat("<color=yellow>/chat</color> - Toggle chat");
+                            AddToChat("<color=yellow>/ping</color> - Toggle ping display");
+                            AddToChat("====================================\n");
+                            success = true;
+                        }
+                        if (message.ToLower() == "/c" || message.ToLower() == "/cursor")
                         {
                             if (Cursor.visible)
                             {
@@ -279,24 +294,24 @@ namespace KarlsonMP
                                 Cursor.visible = true;
                                 Cursor.lockState = CursorLockMode.None;
                             }
-                            succes = true;
+                            success = true;
                         }
-                        if(message.ToLower() == "/cc")
+                        if(message.ToLower() == "/cc" || message.ToLower() == "/clearchat")
                         {
                             chat = "";
-                            succes = true;
+                            success = true;
                         }
-                        if(message.ToLower() == "/tog")
+                        if(message.ToLower() == "/chat")
                         {
                             isChatEnabled = !isChatEnabled;
-                            succes = true;
+                            success = true;
                         }
                         if(message.ToLower() == "/ping")
                         {
                             showPing = !showPing;
-                            succes = true;
+                            success = true;
                         }
-                        if(succes)
+                        if(success)
                         {
                             isChatOpened = false;
                             return;
