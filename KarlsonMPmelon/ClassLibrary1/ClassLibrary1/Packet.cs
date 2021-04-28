@@ -52,6 +52,11 @@ namespace KarlsonMP
         /// client: tell the server we finished a level
         /// </summary>
         finishLevel,
+        /// <summary>
+        /// server: ask the client to echo back the packet to measure ping |
+        /// client: echo back to the server
+        /// </summary>
+        ping,
     }
 
     public class Packet : IDisposable

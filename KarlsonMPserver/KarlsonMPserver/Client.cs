@@ -42,7 +42,7 @@ namespace KarlsonMPserver
                 receivedData = new Packet();
                 receiveBuffer = new byte[dataBufferSize];
                 stream.BeginRead(receiveBuffer, 0, dataBufferSize, ReceiveCallback, null);
-                ServerSend.Welcome(id, "KarlsonMP " + Constants.version);
+                ServerSend.Welcome(id, Constants.motd);
             }
 
             private void ReceiveCallback(IAsyncResult ar)

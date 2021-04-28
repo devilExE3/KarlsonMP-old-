@@ -45,7 +45,7 @@ namespace KarlsonMPserver
             using (StreamWriter writer = new(client.GetStream()))
             {
                 writer.AutoFlush = true;
-                writer.WriteLine("GET /karlson/status/index.php?server=1 HTTP/1.1");
+                writer.WriteLine($"GET /karlson/status/index.php?server=1&version={Constants.version}&players={Server.OnlinePlayers()} HTTP/1.1");
                 writer.WriteLine("Host: api.xiloe.fr:80");
                 writer.WriteLine("Connection: close");
                 writer.WriteLine("");

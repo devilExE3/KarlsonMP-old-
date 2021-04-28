@@ -13,17 +13,30 @@ namespace KarlsonMPserver
         {
             int _checkId = _packet.ReadInt();
             string _username = _packet.ReadString();
+            string _version = _packet.ReadString();
             if (_checkId != _fromClient)
             {
                 Console.WriteLine($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} assumed wrong ID {_checkId} (Sent from {_fromClient})");
                 Server.clients[_fromClient].Disconnect();
                 return;
             }
+            if(Constants.OutOfDate(Constants.version, _version) > 1)
+            {
+                Console.WriteLine($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} outdated version {_version}");
+                ServerSend.Chat(_fromClient, "<color=red>You are running an older version of karlson.</color>");
+                Server.clients[_fromClient].Disconnect();
+                return;
+            }
+            if (Constants.OutOfDate(Constants.version, _version) < 1)
+            {
+                Console.WriteLine($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} outdated version {_version}");
+                ServerSend.Chat(_fromClient, "<color=red>You are running a newer version of karlson.</color>");
+                Server.clients[_fromClient].Disconnect();
+                return;
+            }
             Console.WriteLine($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} connected with ID {_fromClient} and username {_username}");
             Server.clients[_fromClient].player = new Player(_fromClient, _username);
         }
-
-        
 
         public static void EnterScene(int _fromClient, Packet _packet)
         {

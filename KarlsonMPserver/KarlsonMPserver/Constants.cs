@@ -8,7 +8,8 @@ namespace KarlsonMPserver
 {
     class Constants
     {
-        public const string version = "Official primary server";
+        public const string motd = "Official primary server";
+        public const string version = "1.0.2";
         public const int TPS = 30;
         public const int MS_PER_TICK = 1000 / TPS;
 
@@ -42,6 +43,17 @@ namespace KarlsonMPserver
             if (i < 10)
                 return "0" + i;
             return "" + i;
+        }
+
+        public static int OutOfDate(string server, string client)
+        {
+            int[] nVer = Array.ConvertAll(server.Split('.'), s => int.Parse(s));
+            int[] oVer = Array.ConvertAll(client.Split('.'), s => int.Parse(s));
+            if (nVer[0] < oVer[0] || nVer[1] < oVer[1] || nVer[2] < oVer[2])
+                return -1;
+            if (nVer[0] > oVer[0] || nVer[1] > oVer[1] || nVer[2] > oVer[2])
+                return 1;
+            return 0;
         }
     }
 }

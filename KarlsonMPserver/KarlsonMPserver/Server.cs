@@ -17,6 +17,15 @@ namespace KarlsonMPserver
         public delegate void PacketHandler(int _fromClient, Packet _packet);
         public static Dictionary<int, PacketHandler> packetHandlers;
 
+        public static int OnlinePlayers()
+        {
+            int online = 0;
+            for (int i = 1; i <= MaxPlayers; i++)
+                if (clients[i].tcp.socket != null)
+                    online++;
+            return online;
+        }
+
         public static void Start(int _port, int _maxPlayers)
         {
             Port = _port;

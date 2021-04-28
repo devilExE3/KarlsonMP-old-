@@ -105,7 +105,7 @@ namespace KarlsonMPserver
             using Packet _packet = new((int)PacketID.ping);
             List<int> _clients = new();
             for (int i = 1; i <= Server.MaxPlayers; i++)
-                if (Server.clients[i].tcp.socket != null && Server.clients[i].player.lastPing != DateTime.MinValue)
+                if (Server.clients[i].tcp.socket != null && Server.clients[i].player != null && Server.clients[i].player.lastPing != DateTime.MinValue)
                     _clients.Add(i);
             SendTCPData(_clients.ToArray(), _packet);
         }
