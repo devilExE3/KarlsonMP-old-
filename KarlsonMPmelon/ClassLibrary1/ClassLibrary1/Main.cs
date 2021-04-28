@@ -109,18 +109,9 @@ namespace KarlsonMP
             File.Delete(Path.Combine(Application.dataPath, "..", "Mods", "KarlsonMP.dll"));
             using (WebClient wc = new WebClient())
             {
-                progress = 1;
-                wc.DownloadProgressChanged += (object sender, DownloadProgressChangedEventArgs e) =>
-                {
-                    MelonLogger.Msg("Donwloading: " + e.ProgressPercentage + "%");
-                    progress = e.ProgressPercentage;
-                };
-                wc.DownloadFileCompleted += (object sender, AsyncCompletedEventArgs e) =>
-                {
-                    Process.Start(Path.Combine(Application.dataPath, "..", "Karlson.exe"));
-                    Application.Quit(0);
-                };
                 wc.DownloadFile(new Uri(updateLink), Path.Combine(Application.dataPath, "..", "Mods", "KarlsonMP.dll"));
+                Process.Start(Path.Combine(Application.dataPath, "..", "Karlson.exe"));
+                Application.Quit(0);
             }
         }
 
@@ -154,6 +145,7 @@ namespace KarlsonMP
         private static Rect popupWindow = new Rect(Screen.width / 2 - 150f, Screen.height / 2 - 100f, 300f, 200f);
         private static int progress = 0;
         private bool isChatOpened = false;
+        private bool isChatEnabled = true;
         private string chatField = "";
         private static string chat = "";
         public override void OnGUI()
@@ -161,8 +153,6 @@ namespace KarlsonMP
             if(needToUpdate)
             {
                 GUI.Box(popupWindow, "KarlsonMP Update");
-                GUIStyle whiteBox = new GUIStyle();
-                whiteBox.normal.background = Texture2D.whiteTexture;
                 GUIStyle middle = new GUIStyle();
                 middle.normal.textColor = Color.white;
                 middle.alignment = TextAnchor.UpperCenter;
@@ -175,7 +165,10 @@ namespace KarlsonMP
                 if (GUI.Button(new Rect(150f, 170f, 150f, 30f), "Cancel - You won't be\nable play multiplayer"))
                     needToUpdate = false;
                 if (GUI.Button(new Rect(0f, 170f, 150f, 30f), "Update"))
+                {
+                    progress = 1;
                     DownloadNewFile();
+                }
                 GUI.EndGroup();
             }
             if (SceneManager.GetActiveScene().name == "MainMenu" || UIManger.Instance.deadUI.activeSelf || UIManger.Instance.winUI.activeSelf)
@@ -263,16 +256,21 @@ namespace KarlsonMP
                     GUI.Box(new Rect(pos.x - textSize.x / 2, (Screen.height - pos.y) - textSize.y / 2, textSize.x, textSize.y), text);
                 }
             }
+            if (isChatEnabled)
+                GUI.Label(new Rect(2f, 20f, Screen.width, Screen.height), chat);
             if (isChatOpened)
             {
                 GUI.SetNextControlName("chatfield");
-                chatField = GUI.TextArea(new Rect(0f, Screen.height-20f, 400f, 20f), chatField);
+                chatField = GUI.TextArea(new Rect(0f, 0f, 400f, 20f), chatField);
+                chatField = chatField.Substring(0, Math.Min(128, chatField.Length)); // woopsies
                 GUI.FocusControl("chatfield");
                 if (chatField.Contains("\n")) // pressed return
                 {
-                    if(chatField.StartsWith("/"))
+                    string message = chatField.Replace("\n", "").Trim();
+                    if (message.StartsWith("/"))
                     {
-                        if(chatField.Trim().ToLower() == "/c")
+                        bool succes = false; // we don't want to block every text with a `/`, we might add commands on the server as well
+                        if (message.ToLower() == "/c")
                         {
                             if (Cursor.visible)
                             {
@@ -284,16 +282,26 @@ namespace KarlsonMP
                                 Cursor.visible = true;
                                 Cursor.lockState = CursorLockMode.None;
                             }
+                            succes = true;
                         }
-                        if(chatField.Trim().ToLower() == "/cc")
+                        if(message.ToLower() == "/cc")
                         {
                             chat = "";
+                            succes = true;
                         }
-                        isChatOpened = false;
-                        return;
+                        if(message.ToLower() == "/tog")
+                        {
+                            isChatEnabled = !isChatEnabled;
+                            succes = true;
+                        }
+                        if(succes)
+                        {
+                            isChatOpened = false;
+                            return;
+                        }
                     }
-                    if (chatField.Trim().Length > 0)
-                        ClientSend.ChatMsg(chatField.Replace("\n", "").Trim());
+                    if (message.Length > 0)
+                        ClientSend.ChatMsg(message);
                     isChatOpened = false;
                 }
                 if (chatField.Contains("`"))
@@ -304,7 +312,7 @@ namespace KarlsonMP
         public static void AddToChat(string str)
         {
             while (chat.Split('\n').Length > 30)
-                chat = chat.Substring(chat.IndexOf('\n') + 1); // limit to 150 lines
+                chat = chat.Substring(chat.IndexOf('\n') + 1); // limit to 30 lines
             chat += str + "\n";
         }
 
