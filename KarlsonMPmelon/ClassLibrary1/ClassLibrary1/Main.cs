@@ -266,10 +266,6 @@ namespace KarlsonMP
                     string message = chatField.Replace("\n", "").Trim();
                     if (message.StartsWith("/"))
                     {
-                        bool succes = false; // we don't want to block every text with a `/`, we might add commands on the server as well
-                        string message = chatField.Replace("\n", "").Trim();
-                    if (message.StartsWith("/"))
-                    {
                         bool success = false; // we don't want to block every text with a `/`, we might add commands on the server as well
                         if (message.ToLower() == "/help" || message.ToLower() == "/h")
                         {
@@ -296,22 +292,22 @@ namespace KarlsonMP
                             }
                             success = true;
                         }
-                        if(message.ToLower() == "/cc" || message.ToLower() == "/clearchat")
+                        if (message.ToLower() == "/cc" || message.ToLower() == "/clearchat")
                         {
                             chat = "";
                             success = true;
                         }
-                        if(message.ToLower() == "/chat")
+                        if (message.ToLower() == "/chat")
                         {
                             isChatEnabled = !isChatEnabled;
                             success = true;
                         }
-                        if(message.ToLower() == "/ping")
+                        if (message.ToLower() == "/ping")
                         {
                             showPing = !showPing;
                             success = true;
                         }
-                        if(success)
+                        if (success)
                         {
                             isChatOpened = false;
                             return;
