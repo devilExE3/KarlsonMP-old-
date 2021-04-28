@@ -12,7 +12,7 @@ namespace KarlsonMPserver
         {
 
             input = RemoveRichTextDynamicTag(input, "color");
-            input = RemoveRichTextDynamicTag(input, "a");
+            input = RemoveRichTextTag(input, "a");
 
             input = RemoveRichTextTag(input, "b");
             input = RemoveRichTextTag(input, "i");

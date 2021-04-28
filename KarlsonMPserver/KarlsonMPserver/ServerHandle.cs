@@ -14,6 +14,7 @@ namespace KarlsonMPserver
             int _checkId = _packet.ReadInt();
             string _username = _packet.ReadString();
             _username = Utils.RemoveRichText(_username);
+            _username = _username.Substring(0, Math.Min(32, _username.Length));
             string _version = "0.0.0";
             try
             {
@@ -116,6 +117,9 @@ namespace KarlsonMPserver
         {
             string _msg = _packet.ReadString();
             // handle commands ?
+            if (Utils.RemoveRichText(_msg).Trim().Length == 0)
+                return; // empty message
+            _msg = _msg.Substring(0, Math.Min(128, _msg.Length));
             ServerSend.Chat(Utils.RemoveRichText(Server.clients[_fromClient].player.username + ": " + _msg));
         }
 
