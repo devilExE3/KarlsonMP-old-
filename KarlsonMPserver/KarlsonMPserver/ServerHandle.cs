@@ -107,5 +107,11 @@ namespace KarlsonMPserver
             int miliseconds = _packet.ReadInt();
             ServerSend.Chat("<b>*</b> " + Server.clients[_fromClient].player.username + " finished " + Constants.sceneNames[Constants.allowedSceneNames.ToList().IndexOf(Server.clients[_fromClient].player.scene)] + " in " + Constants.FormatMiliseconds(miliseconds));
         }
+
+        public static void Ping(int _fromClient, Packet _packet)
+        {
+            Server.clients[_fromClient].player.ping = (int)(DateTime.Now - Server.clients[_fromClient].player.lastPing).TotalMilliseconds;
+            Server.clients[_fromClient].player.lastPing = DateTime.MinValue;
+        }
     }
 }

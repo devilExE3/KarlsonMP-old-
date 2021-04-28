@@ -16,5 +16,7 @@ namespace KarlsonMPserver
         public readonly int id;
         public readonly string username;
         public string scene;
+        public DateTime lastPing = DateTime.MinValue;
+        public int ping = -1;
     }
 }

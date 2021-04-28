@@ -54,6 +54,7 @@ namespace KarlsonMPserver
                 { (int)PacketID.clientMove,     ServerHandle.ClientMove },
                 { (int)PacketID.chat,           ServerHandle.Chat },
                 { (int)PacketID.finishLevel,    ServerHandle.FinishLevel },
+                { (int)PacketID.ping,           ServerHandle.Ping },
             };
         }
     }

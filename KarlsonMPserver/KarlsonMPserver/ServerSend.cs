@@ -14,19 +14,23 @@ namespace KarlsonMPserver
             _packet.WriteLength();
             Server.clients[_toClient].tcp.SendData(_packet.ToArray());
         }
-
         private static void SendTCPData(int[] _toClients, Packet _packet)
         {
             _packet.WriteLength();
             foreach (int _client in _toClients)
                 Server.clients[_client].tcp.SendData(_packet.ToArray());
         }
-
         private static void SendTCPData(Packet _packet)
         {
             _packet.WriteLength();
             for (int i = 1; i <= Server.MaxPlayers; i++)
                 if (Server.clients[i].tcp.socket != null)
+                    Server.clients[i].tcp.SendData(_packet.ToArray());
+        }
+        private static void SendTCPData(Packet _packet, int[] _exceptClients)
+        {
+            for (int i = 1; i <= Server.MaxPlayers; i++)
+                if (Server.clients[i].tcp.socket != null && !_exceptClients.Contains(i))
                     Server.clients[i].tcp.SendData(_packet.ToArray());
         }
 
@@ -94,6 +98,16 @@ namespace KarlsonMPserver
             using Packet _packet = new((int)PacketID.chat);
             _packet.Write(_message);
             SendTCPData(_packet);
+        }
+
+        public static void PingAll()
+        {
+            using Packet _packet = new((int)PacketID.ping);
+            List<int> _clients = new();
+            for (int i = 1; i <= Server.MaxPlayers; i++)
+                if (Server.clients[i].tcp.socket != null && Server.clients[i].player.lastPing != DateTime.MinValue)
+                    _clients.Add(i);
+            SendTCPData(_clients.ToArray(), _packet);
         }
     }
 }
