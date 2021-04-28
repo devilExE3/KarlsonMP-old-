@@ -6,7 +6,7 @@ using HarmonyLib;
 namespace KarlsonMP
 {
     [HarmonyPatch(typeof(Enemy), "LateUpdate")]
-    public class Enemy_LateUpdate
+    public static class Enemy_LateUpdate
     {
         public static bool Prefix(Enemy __instance)
         {
@@ -17,7 +17,7 @@ namespace KarlsonMP
     }
 
     [HarmonyPatch(typeof(Debug), "Update")]
-    public class Debug_Update
+    public static class Debug_Update
     {
         public static bool Prefix(Debug __instance)
         {
