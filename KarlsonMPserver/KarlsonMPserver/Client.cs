@@ -47,6 +47,11 @@ namespace KarlsonMPserver
 
             private void ReceiveCallback(IAsyncResult ar)
             {
+                if(stream == null)
+                {
+                    Server.clients[id].Disconnect();
+                    return;
+                }
                 try
                 {
                     int _byteLength = stream.EndRead(ar);
@@ -117,6 +122,8 @@ namespace KarlsonMPserver
 
             public void Disconnect()
             {
+                if (socket == null)
+                    return;
                 socket.Close();
                 stream = null;
                 receivedData = null;
@@ -128,7 +135,7 @@ namespace KarlsonMPserver
         public void Disconnect()
         {
             Console.WriteLine($"ID {id} has disconnected");
-            if(player.scene != "")
+            if(player != null && player.scene != "")
             {
                 string old = player.scene;
                 player.scene = "";

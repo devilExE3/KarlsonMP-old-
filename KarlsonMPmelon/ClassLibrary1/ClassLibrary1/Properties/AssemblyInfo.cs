@@ -36,5 +36,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
-[assembly: MelonInfo(typeof(KarlsonMP.Main), "KarlsonMP", "1.0.1", "devilExE")]
+[assembly: MelonInfo(typeof(KarlsonMP.Main), "KarlsonMP", "1.0.2", "devilExE")]
 [assembly: MelonGame("Dani", "Karlson")]

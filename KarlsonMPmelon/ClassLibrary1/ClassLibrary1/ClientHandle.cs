@@ -82,5 +82,11 @@ namespace KarlsonMP
         {
             Main.AddToChat(_packet.ReadString());
         }
+
+        public static void Ping(Packet _packet)
+        {
+            Client.instance.ping = _packet.ReadInt();
+            ClientSend.Ping();
+        }
     }
 }

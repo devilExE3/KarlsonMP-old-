@@ -22,6 +22,8 @@ namespace KarlsonMP
         public bool isConnected = false;
         public bool isConnecting = false;
 
+        public int ping = -1;
+
         private delegate void PacketHandler(Packet _packet);
         private static Dictionary<int, PacketHandler> packetHandlers;
 
@@ -159,6 +161,7 @@ namespace KarlsonMP
                 { (int)PacketID.clientInfo,     ClientHandle.ClientInfo },
                 { (int)PacketID.clientMove,     ClientHandle.ClientMove },
                 { (int)PacketID.chat,           ClientHandle.Chat },
+                { (int)PacketID.ping,           ClientHandle.Ping },
             };
         }
 

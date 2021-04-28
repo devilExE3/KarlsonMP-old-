@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MelonLoader;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,15 @@ namespace KarlsonMP
             {
                 _packet.Write(Client.instance.myId);
                 _packet.Write(Client.instance.username);
+                object[] customAttributes = System.Reflection.Assembly.GetExecutingAssembly().GetCustomAttributes(false);
+                string oldVer = "0.0.0"; // should always return true in OutOfDate if foreach failes
+                foreach (var ca in customAttributes)
+                {
+                    if (ca.GetType() != typeof(MelonInfoAttribute))
+                        continue;
+                    oldVer = ((MelonInfoAttribute)ca).Version;
+                }
+                _packet.Write(oldVer);
                 SendTCPData(_packet);
             }
 
@@ -77,6 +87,12 @@ namespace KarlsonMP
                 _packet.Write(miliseconds);
                 SendTCPData(_packet);
             }
+        }
+
+        public static void Ping()
+        {
+            using (Packet _packet = new Packet((int)PacketID.ping))
+                SendTCPData(_packet);
         }
     }
 }

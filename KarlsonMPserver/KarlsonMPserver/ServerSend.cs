@@ -102,12 +102,14 @@ namespace KarlsonMPserver
 
         public static void PingAll()
         {
-            using Packet _packet = new((int)PacketID.ping);
-            List<int> _clients = new();
             for (int i = 1; i <= Server.MaxPlayers; i++)
-                if (Server.clients[i].tcp.socket != null && Server.clients[i].player != null && Server.clients[i].player.lastPing != DateTime.MinValue)
-                    _clients.Add(i);
-            SendTCPData(_clients.ToArray(), _packet);
+                if (Server.clients[i].tcp.socket != null && Server.clients[i].player != null && Server.clients[i].player.lastPing == DateTime.MinValue)
+                {
+                    Server.clients[i].player.lastPing = DateTime.Now;
+                    using Packet _packet = new((int)PacketID.ping);
+                    _packet.Write(Server.clients[i].player.ping);
+                    SendTCPData(i, _packet);
+                }
         }
     }
 }

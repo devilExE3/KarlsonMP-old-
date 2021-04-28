@@ -13,24 +13,28 @@ namespace KarlsonMPserver
         {
             int _checkId = _packet.ReadInt();
             string _username = _packet.ReadString();
-            string _version = _packet.ReadString();
-            if (_checkId != _fromClient)
+            string _version = "0.0.0";
+            try
             {
-                Console.WriteLine($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} assumed wrong ID {_checkId} (Sent from {_fromClient})");
-                Server.clients[_fromClient].Disconnect();
-                return;
+                _version = _packet.ReadString();
             }
-            if(Constants.OutOfDate(Constants.version, _version) > 1)
+            catch
             {
                 Console.WriteLine($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} outdated version {_version}");
                 ServerSend.Chat(_fromClient, "<color=red>You are running an older version of karlson.</color>");
                 Server.clients[_fromClient].Disconnect();
                 return;
             }
-            if (Constants.OutOfDate(Constants.version, _version) < 1)
+            if (_checkId != _fromClient)
+            {
+                Console.WriteLine($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} assumed wrong ID {_checkId} (Sent from {_fromClient})");
+                Server.clients[_fromClient].Disconnect();
+                return;
+            }
+            if(_version != Constants.version)
             {
                 Console.WriteLine($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} outdated version {_version}");
-                ServerSend.Chat(_fromClient, "<color=red>You are running a newer version of karlson.</color>");
+                ServerSend.Chat(_fromClient, "<color=red>You are running different version of KarlsonMP than the server.</color>\nPlease refer to api.xiloe.fr/karlson/status for more information");
                 Server.clients[_fromClient].Disconnect();
                 return;
             }

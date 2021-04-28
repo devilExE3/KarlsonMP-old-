@@ -144,6 +144,7 @@ namespace KarlsonMP
         private bool isChatEnabled = true;
         private string chatField = "";
         private static string chat = "";
+        private bool showPing = true;
         public override void OnGUI()
         {
             if(needToUpdate)
@@ -290,6 +291,11 @@ namespace KarlsonMP
                             isChatEnabled = !isChatEnabled;
                             succes = true;
                         }
+                        if(message.ToLower() == "/ping")
+                        {
+                            showPing = !showPing;
+                            succes = true;
+                        }
                         if(succes)
                         {
                             isChatOpened = false;
@@ -302,6 +308,13 @@ namespace KarlsonMP
                 }
                 if (chatField.Contains("`"))
                     isChatOpened = false;
+            }
+            if (Client.instance.isConnected && showPing)
+            {
+                string pingStr = "Ping: " + Client.instance.ping + "ms";
+                Vector2 pingSize = GUI.skin.label.CalcSize(new GUIContent(pingStr));
+                GUI.Box(new Rect(0f, Screen.height - pingSize.y, pingSize.x + 8f, pingSize.y), "");
+                GUI.Label(new Rect(4f, Screen.height - pingSize.y, pingSize.x, pingSize.y), pingStr); // wierd, i know
             }
         }
 
