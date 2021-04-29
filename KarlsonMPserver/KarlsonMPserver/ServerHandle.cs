@@ -120,23 +120,26 @@ namespace KarlsonMPserver
             if (_msg.StartsWith("/"))
             {
                 string[] arguments = _msg.ToLower().Split(" ");
-                if (arguments[1] == "color")
+                if (_msg.ToLower().StartsWith("/color"))
                 {
                     List<string> colors = new List<string>() { "black", "blue", "cyan", "green", "orange", "purple", "red", "white", "yellow" };
-                    if (colors.Contains(arguments[2]))
-                        Server.clients[_fromClient].player.color = arguments[2];
+                    if (colors.Contains(arguments[1]))
+                        Server.clients[_fromClient].player.color = arguments[1];
                     else
-                        ServerSend.Chat(_fromClient, $"<color=red>Color \"{arguments[2]}\" is not a valid color. Valid colors are, black, blue, cyan, green, orange, purple, red, white, and yellow.</color>");
+                        ServerSend.Chat(_fromClient, $"<color=red>Color \"{arguments[1]}\" is not a valid color. Valid colors are, black, blue, cyan, green, orange, purple, red, white, and yellow.</color>");
                 }
-                if (arguments[1] == "help" || arguments[1] == "h")
+                if (_msg.ToLower().StartsWith("/help") || _msg.ToLower().StartsWith("/h"))
                 {
-                    if (arguments[2] == "color")
+                    if (arguments.Length >= 2)
                     {
-                        ServerSend.Chat(_fromClient, "\n=========== Help - Commands ===========");
-                        ServerSend.Chat(_fromClient, "<color=yellow>Available colors: black, blue, cyan, green, orange, purple, red, white, and yellow</color>");
-                        ServerSend.Chat(_fromClient, "<color=yellow>/color</color> <color=orange>colorName</color> - Changes your username to <color=orange>colorName</color>");
-                        ServerSend.Chat(_fromClient, "====================================\n");
-                        return;
+                        if (arguments[1] == "color")
+                        {
+                            ServerSend.Chat(_fromClient, "\n=========== Help - Commands ===========");
+                            ServerSend.Chat(_fromClient, "<color=yellow>Available colors: black, blue, cyan, green, orange, purple, red, white, and yellow</color>");
+                            ServerSend.Chat(_fromClient, "<color=yellow>/color</color> <color=orange>colorName</color> - Changes your username to <color=orange>colorName</color>");
+                            ServerSend.Chat(_fromClient, "====================================\n");
+                            return;
+                        }
                     }
 
                     ServerSend.Chat(_fromClient, "\n=========== Help - Commands ===========");
