@@ -40,6 +40,13 @@ namespace KarlsonMPserver
                 Server.clients[_fromClient].Disconnect();
                 return;
             }
+            if(_username.Trim().Length == 0)
+            {
+                Program.Log($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} empty username");
+                ServerSend.Chat(_fromClient, "<color=red>Invalid username.</color>");
+                Server.clients[_fromClient].Disconnect();
+                return;
+            }
             Program.Log($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} connected with ID {_fromClient} and username {_username}");
             Server.clients[_fromClient].player = new Player(_fromClient, _username);
             ServerSend.Chat("<color=green>[+] <b>" + _username + "</b></color>");
@@ -159,13 +166,15 @@ namespace KarlsonMPserver
             if (Utils.RemoveRichText(_msg).Trim().Length == 0)
                 return; // empty message
             _msg = _msg.Substring(0, Math.Min(128, _msg.Length));
-            ServerSend.Chat($"<color={Server.clients[_fromClient].player.color}>" + Utils.RemoveRichText($"{Server.clients[_fromClient].player.username}") + $"</color>: {Utils.RemoveRichText(_msg)}");
+            ServerSend.Chat($"<color={Server.clients[_fromClient].player.color}>{Server.clients[_fromClient].player.username}</color>: {Utils.RemoveRichText(_msg)}");
         }
 
         public static void FinishLevel(int _fromClient, Packet _packet)
         {
             if (Server.clients[_fromClient].player.scene == "")
                 return; // client isn't in any scene that we know of
+            if (!Constants.allowedSceneNames.Contains(Server.clients[_fromClient].player.scene))
+                return; // not in a valid scene
             int miliseconds = _packet.ReadInt();
             ServerSend.Chat("<color=yellow>* <b>" + Server.clients[_fromClient].player.username + "</b> finished <b>" + Constants.sceneNames[Constants.allowedSceneNames.ToList().IndexOf(Server.clients[_fromClient].player.scene)] + "</b> in " + Constants.FormatMiliseconds(miliseconds) + "</color>");
         }

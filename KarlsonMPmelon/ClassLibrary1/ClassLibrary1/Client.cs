@@ -73,7 +73,7 @@ namespace KarlsonMP
 
             private void ReceiveCallback(IAsyncResult ar)
             {
-                if (stream == null)
+                if (stream == null || receiveBuffer == null || socket == null)
                 {
                     Disconnect();
                     return;
@@ -93,7 +93,7 @@ namespace KarlsonMP
                 }
                 catch (Exception _ex)
                 {
-                    Main.AddToChat($"<color=red>Error while receiving data: {_ex}</color>");
+                    Main.AddToChat($"<color=red>Error while receiving data: {_ex}</color>".Replace("\n", "</color>\n<color=red>"));
                     Disconnect();
                 }
             }
@@ -135,13 +135,13 @@ namespace KarlsonMP
             {
                 try
                 {
-                    if (socket == null)
+                    if (socket == null || stream == null)
                         return;
                     stream.BeginWrite(_data, 0, _data.Length, null, null);
                 }
                 catch (Exception _ex)
                 {
-                    Main.AddToChat($"<color=red>Error while sending data {_ex}</color>");
+                    Main.AddToChat($"<color=red>Error while sending data {_ex}</color>".Replace("\n", "</color>\n<color=red>"));
                 }
             }
 
