@@ -123,10 +123,11 @@ namespace KarlsonMPserver
                 if (_msg.ToLower().StartsWith("/color"))
                 {
                     List<string> colors = new List<string>() { "black", "blue", "cyan", "green", "orange", "purple", "red", "white", "yellow" };
-                    if (colors.Contains(arguments[1]))
-                        Server.clients[_fromClient].player.color = arguments[1];
-                    else
-                        ServerSend.Chat(_fromClient, $"<color=red>Color \"{arguments[1]}\" is not a valid color. Valid colors are, black, blue, cyan, green, orange, purple, red, white, and yellow.</color>");
+                    if (arguments.Length >= 2)
+                        if (colors.Contains(arguments[1]))
+                            Server.clients[_fromClient].player.color = arguments[1];
+                        else
+                            ServerSend.Chat(_fromClient, $"<color=red>Color \"{arguments[1]}\" is not a valid color. Valid colors are, black, blue, cyan, green, orange, purple, red, white, and yellow.</color>");
                 }
                 if (_msg.ToLower().StartsWith("/help") || _msg.ToLower().StartsWith("/h"))
                 {
