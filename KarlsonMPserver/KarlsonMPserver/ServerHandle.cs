@@ -116,11 +116,46 @@ namespace KarlsonMPserver
         public static void Chat(int _fromClient, Packet _packet)
         {
             string _msg = _packet.ReadString();
-            // handle commands ?
+
+            if (_msg.StartsWith("/"))
+            {
+                string[] arguments = _msg.ToLower().Split(" ");
+                if (arguments[1] == "color")
+                {
+                    List<string> colors = new List<string>() { "black", "blue", "cyan", "green", "orange", "purple", "red", "white", "yellow" };
+                    if (colors.Contains(arguments[2]))
+                        Server.clients[_fromClient].player.color = arguments[2];
+                    else
+                        ServerSend.Chat(_fromClient, $"<color=red>Color \"{arguments[2]}\" is not a valid color. Valid colors are, black, blue, cyan, green, orange, purple, red, white, and yellow.</color>");
+                }
+                if (arguments[1] == "help" || arguments[1] == "h")
+                {
+                    if (arguments[2] == "color")
+                    {
+                        ServerSend.Chat(_fromClient, "\n=========== Help - Commands ===========");
+                        ServerSend.Chat(_fromClient, "<color=yellow>Available colors: black, blue, cyan, green, orange, purple, red, white, and yellow</color>");
+                        ServerSend.Chat(_fromClient, "<color=yellow>/color</color> <color=orange>colorName</color> - Changes your username to <color=orange>colorName</color>");
+                        ServerSend.Chat(_fromClient, "====================================\n");
+                        return;
+                    }
+
+                    ServerSend.Chat(_fromClient, "\n=========== Help - Commands ===========");
+                    ServerSend.Chat(_fromClient, "<color=yellow>Tips:</color> doing <color=yellow>/help</color> <color=orange>command</color> or <color=yellow>/h</color> <color=orange>command</color> will give you more infos on a command!");
+                    ServerSend.Chat(_fromClient, "<color=yellow>/help</color> or <color=yellow>/h</color> - Shows this message");
+                    ServerSend.Chat(_fromClient, "<color=yellow>/color</color> <color=orange>colorName</color> - Changes your username to <color=orange>colorName</color>");
+                    ServerSend.Chat(_fromClient, "<color=yellow>/cc</color> or <color=yellow>/clearchat</color> - Clears the chat");
+                    ServerSend.Chat(_fromClient, "<color=yellow>/c</color> or <color=yellow>/cursor</color> - Toggles the cursor");
+                    ServerSend.Chat(_fromClient, "<color=yellow>/chat</color> - Toggles the chat");
+                    ServerSend.Chat(_fromClient, "<color=yellow>/ping</color> - Toggles the ping display");
+                    ServerSend.Chat(_fromClient, "====================================\n");
+                }
+                return;
+            }
+
             if (Utils.RemoveRichText(_msg).Trim().Length == 0)
                 return; // empty message
             _msg = _msg.Substring(0, Math.Min(128, _msg.Length));
-            ServerSend.Chat(Utils.RemoveRichText(Server.clients[_fromClient].player.username + ": " + _msg));
+            ServerSend.Chat($"<color={Server.clients[_fromClient].player.color}>" + Utils.RemoveRichText($"{Server.clients[_fromClient].player.username}") + $"</color>: {_msg}");
         }
 
         public static void FinishLevel(int _fromClient, Packet _packet)

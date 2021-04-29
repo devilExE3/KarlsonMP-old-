@@ -13,6 +13,7 @@ namespace KarlsonMPserver
     {
         public static int MaxPlayers { get; private set; }
         public static int Port { get; private set; }
+        public static string Branch = "main"; // TODO: add it to the server config
         public static Dictionary<int, Client> clients = new();
         private static TcpListener listener;
         public delegate void PacketHandler(int _fromClient, Packet _packet);
