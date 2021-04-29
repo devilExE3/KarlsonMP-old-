@@ -159,7 +159,7 @@ namespace KarlsonMPserver
             if (Utils.RemoveRichText(_msg).Trim().Length == 0)
                 return; // empty message
             _msg = _msg.Substring(0, Math.Min(128, _msg.Length));
-            ServerSend.Chat($"<color={Server.clients[_fromClient].player.color}>" + Utils.RemoveRichText($"{Server.clients[_fromClient].player.username}") + $"</color>: {_msg}");
+            ServerSend.Chat($"<color={Server.clients[_fromClient].player.color}>" + Utils.RemoveRichText($"{Server.clients[_fromClient].player.username}") + $"</color>: {Utils.RemoveRichText(_msg)}");
         }
 
         public static void FinishLevel(int _fromClient, Packet _packet)
