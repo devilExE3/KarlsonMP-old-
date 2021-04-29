@@ -94,6 +94,7 @@ namespace KarlsonMP
             if (DataSave.IpHistory.Count > 0)
                 ipField = DataSave.IpHistory.Last(); // load last connected to ip
             SceneManager.sceneLoaded += OnSceneLoaded;
+            ClientHandle.scoreboard = new ClientHandle.Scoreboard();
         }
 
         private void DownloadNewFile()
@@ -312,6 +313,18 @@ namespace KarlsonMP
                 GUI.Box(new Rect(0f, Screen.height - pingSize.y, pingSize.x + 8f, pingSize.y), "");
                 GUI.Label(new Rect(4f, Screen.height - pingSize.y, pingSize.x, pingSize.y), pingStr); // wierd, i know
             }
+
+            if(Client.instance.isConnected && Input.GetKey(KeyCode.Tab))
+            {
+                string insceneText = "<size=20><b>";
+                for (int i = 0; i < 11; i++)
+                    insceneText += sceneNames[i] + ": " + ClientHandle.scoreboard.perLevel[i] + '\n';
+                insceneText = insceneText.Trim();
+                insceneText += "</b></size>";
+                Vector2 insceneSize = GUI.skin.label.CalcSize(new GUIContent(insceneText));
+                GUI.Box(new Rect(20f, 20f, insceneSize.x + 8f, insceneSize.y + 20f), "Players In Level");
+                GUI.Label(new Rect(24f, 40f, insceneSize.x, insceneSize.y), insceneText);
+            }
         }
 
         public static void AddToChat(string str)
@@ -347,5 +360,20 @@ namespace KarlsonMP
         {
             Client.instance.Disconnect();
         }
+
+        public static readonly string[] allowedSceneNames = new string[]
+        {
+            "0Tutorial",
+            "1Sandbox0", "2Sandbox1", "3Sandbox2",
+            "4Escape0", "5Escape1", "6Escape2", "7Escape3",
+            "8Sky0", "9Sky1", "10Sky2"
+        };
+        public static readonly string[] sceneNames = new string[]
+        {
+            "Tutorial",
+            "Sandbox 0", "Sandbox 1", "Sandbox 2",
+            "Escape 0", "Escape 1", "Escape 2", "Escape 3",
+            "Sky 0", "Sky 1", "Sky 2"
+        };
     }
 }

@@ -111,5 +111,33 @@ namespace KarlsonMPserver
                     SendTCPData(i, _packet);
                 }
         }
+
+        public static void ScoreboardAll()
+        {
+            // this time we'll prepeare the packet ourself and use TCP.SendData
+            using Packet _packet = new((int)PacketID.scoreboard);
+            _packet.Write(Server.OnlinePlayers());
+            _packet.Write(Server.MaxPlayers);
+            for(int i = 0; i < 11; i++)
+            {
+                int currentScene = 0;
+                for (int j = 1; j <= Server.MaxPlayers; j++)
+                    if (Server.clients[j].tcp.socket != null && Server.clients[j].player != null && Server.clients[j].player.scene == Constants.allowedSceneNames[i])
+                        currentScene++;
+                _packet.Write(currentScene);
+            }
+            for (int i = 1; i <= Server.MaxPlayers; i++)
+                if (Server.clients[i].tcp.socket != null && Server.clients[i].player != null)
+                {
+                    _packet.Write(i);
+                    _packet.Write(Server.clients[i].player.username);
+                    _packet.Write(Server.clients[i].player.scene);
+                    _packet.Write(Server.clients[i].player.ping);
+                }
+            _packet.WriteLength();
+            for (int i = 1; i <= Server.MaxPlayers; i++)
+                if (Server.clients[i].tcp.socket != null && Server.clients[i].player != null)
+                    Server.clients[i].tcp.SendData(_packet.ToArray());
+        }
     }
 }

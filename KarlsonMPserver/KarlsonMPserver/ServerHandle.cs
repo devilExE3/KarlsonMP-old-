@@ -123,7 +123,9 @@ namespace KarlsonMPserver
         public static void Chat(int _fromClient, Packet _packet)
         {
             string _msg = _packet.ReadString();
-
+            _msg = _msg.Trim();
+            _msg = _msg.Replace("\n", "");
+            _msg = _msg.Replace("\r", ""); // could also break idfk
             if (_msg.StartsWith("/"))
             {
                 string[] arguments = _msg.ToLower().Split(" ");

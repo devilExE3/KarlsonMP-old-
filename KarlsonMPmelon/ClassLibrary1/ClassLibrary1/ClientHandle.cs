@@ -88,5 +88,42 @@ namespace KarlsonMP
             Client.instance.ping = _packet.ReadInt();
             ClientSend.Ping();
         }
+
+        public static void ScoreboardHandle(Packet _packet)
+        {
+            scoreboard.onlinePlayers = _packet.ReadInt();
+            scoreboard.maxPlayers = _packet.ReadInt();
+            for (int i = 0; i < 11; i++)
+                scoreboard.perLevel[i] = _packet.ReadInt();
+            scoreboard.players.Clear();
+            for (int i = 0; i < scoreboard.onlinePlayers; i++)
+                scoreboard.players.Add(new Scoreboard.ScoreboardPlayer(_packet.ReadInt(), _packet.ReadString(), _packet.ReadString(), _packet.ReadInt()));
+        }
+
+        public static Scoreboard scoreboard;
+
+        public class Scoreboard
+        {
+            public int onlinePlayers = 0;
+            public int maxPlayers = 0;
+            public int[] perLevel = new int[11];
+            public List<ScoreboardPlayer> players = new List<ScoreboardPlayer>();
+
+            public class ScoreboardPlayer
+            {
+                public ScoreboardPlayer(int _id, string _username, string _scene, int _ping)
+                {
+                    id = _id;
+                    username = _username;
+                    scene = _scene;
+                    ping = _ping;
+                }
+
+                public string username;
+                public string scene;
+                public int ping;
+                public int id;
+            }
+        }
     }
 }

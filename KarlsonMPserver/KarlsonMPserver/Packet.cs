@@ -58,6 +58,11 @@ namespace KarlsonMPserver
         /// client: echo back to the server
         /// </summary>
         ping,
+        /// <summary>
+        /// server: send scoreboard info (online players, per level, names, pings etc) |
+        /// client: -
+        /// </summary>
+        scoreboard,
     }
 
     public class Packet : IDisposable
