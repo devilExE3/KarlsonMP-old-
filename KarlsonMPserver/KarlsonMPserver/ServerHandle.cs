@@ -13,8 +13,8 @@ namespace KarlsonMPserver
         {
             int _checkId = _packet.ReadInt();
             string _username = _packet.ReadString();
-            _username = Utils.RemoveRichText(_username);
             _username = _username.Substring(0, Math.Min(32, _username.Length));
+            _username = Utils.RemoveRichText(_username); // wtf xiloe, stupid ~~bitch~~ :3
             string _version = "0.0.0";
             try
             {
@@ -172,6 +172,8 @@ namespace KarlsonMPserver
 
         public static void Ping(int _fromClient, Packet _)
         {
+            if (Server.clients[_fromClient].player == null)
+                return;
             Server.clients[_fromClient].player.ping = (int)(DateTime.Now - Server.clients[_fromClient].player.lastPing).TotalMilliseconds;
             Server.clients[_fromClient].player.lastPing = DateTime.MinValue;
         }
