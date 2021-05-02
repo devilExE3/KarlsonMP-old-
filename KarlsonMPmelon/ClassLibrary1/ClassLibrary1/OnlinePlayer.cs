@@ -21,5 +21,8 @@ namespace KarlsonMP
         public Vector3 pos;
         public float rot;
         public int id;
+        public GameObject activeGun = null;
+        public GameObject grappleLine = null;
+        public Vector3 grapplePos = Vector3.zero;
     }
 }

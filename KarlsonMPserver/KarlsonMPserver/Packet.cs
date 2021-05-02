@@ -63,6 +63,21 @@ namespace KarlsonMPserver
         /// client: -
         /// </summary>
         scoreboard,
+        /// <summary>
+        /// server: send response to rcon commands |
+        /// client[web]: send rcon command
+        /// </summary>
+        rcon,
+        /// <summary>
+        /// server: tell the client that someone is using a new weapon |
+        /// client: tell the server we are using a new weapon
+        /// </summary>
+        changeGun,
+        /// <summary>
+        /// server: tell the client that someone has started using the grappler / stoped using it |
+        /// client: tell the server that we started using the grappler / stoped using it
+        /// </summary>
+        changeGrapple,
     }
 
     public class Packet : IDisposable

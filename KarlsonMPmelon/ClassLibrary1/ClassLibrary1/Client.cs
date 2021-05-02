@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace KarlsonMP
@@ -21,6 +23,9 @@ namespace KarlsonMP
 
         public bool isConnected = false;
         public bool isConnecting = false;
+        private int failedAttempts = 0;
+
+        public object connectionRetryToken = null;
 
         public int ping = -1;
 
@@ -38,6 +43,8 @@ namespace KarlsonMP
         {
             InitializeClientData();
             tcp.Connect();
+            Main.AddToChat("Connecting to " + instance.ip + ":" + instance.port + "..");
+            failedAttempts = 0;
         }
 
         public class TCP
@@ -57,14 +64,42 @@ namespace KarlsonMP
                 receiveBuffer = new byte[dataBufferSize];
                 socket.BeginConnect(instance.ip, instance.port, ConnectCallback, socket);
                 instance.isConnecting = true;
-                // TODO: add timer to check if we connected to a server, and disconnect if not
+                if (instance.connectionRetryToken != null)
+                {
+                    MelonLoader.MelonCoroutines.Stop(instance.connectionRetryToken);
+                    instance.connectionRetryToken = null;
+                }
+                instance.connectionRetryToken = MelonLoader.MelonCoroutines.Start(CheckTimeout());
+            }
+
+            private IEnumerator CheckTimeout()
+            {
+                yield return new WaitForSeconds(3f);
+                if (socket == null)
+                    yield break;
+                if (!socket.Connected)
+                {
+                    if (instance.failedAttempts >= 10)
+                    {
+                        instance.isConnected = false;
+                        instance.isConnecting = false;
+                        Main.AddToChat("Failed to connect after 10 retries, aborting..");
+                        MelonLoader.MelonCoroutines.Stop(instance.connectionRetryToken);
+                        instance.connectionRetryToken = null;
+                        yield break;
+                    }
+                    Main.AddToChat($"Failed to connect, retrying.. ({instance.failedAttempts})");
+                    Connect();
+                    instance.failedAttempts++;
+                    yield break;
+                }
+                instance.failedAttempts = 0;
             }
 
             private void ConnectCallback(IAsyncResult ar)
             {
                 socket.EndConnect(ar);
                 if (!socket.Connected)
-                    // TODO: reconnect to the server, increasing a counter that cancels this process when it reaches 10
                     return;
                 stream = socket.GetStream();
                 receivedData = new Packet();
@@ -73,7 +108,7 @@ namespace KarlsonMP
 
             private void ReceiveCallback(IAsyncResult ar)
             {
-                if (stream == null || receiveBuffer == null || socket == null)
+                if (stream == null || receiveBuffer == null || socket == null || !socket.Connected)
                 {
                     Disconnect();
                     return;
@@ -169,6 +204,9 @@ namespace KarlsonMP
                 { (int)PacketID.clientMove,     ClientHandle.ClientMove },
                 { (int)PacketID.chat,           ClientHandle.Chat },
                 { (int)PacketID.ping,           ClientHandle.Ping },
+                { (int)PacketID.scoreboard,     ClientHandle.ScoreboardHandle },
+                { (int)PacketID.changeGun,      ClientHandle.ClientChangeGun },
+                { (int)PacketID.changeGrapple,  ClientHandle.PlayerGrapple },
             };
         }
 

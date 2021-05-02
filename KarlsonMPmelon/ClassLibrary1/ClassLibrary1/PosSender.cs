@@ -19,9 +19,9 @@ namespace KarlsonMP
             {
                 if (Vector3.Distance(oldPos, PlayerMovement.Instance.transform.position) > 0.3f || Mathf.Abs(oldRot - Camera.main.transform.rotation.eulerAngles.y) >= 10f)
                 {
-                    ClientSend.ClientMove(PlayerMovement.Instance.transform.position, Camera.main.transform.eulerAngles.y);
+                    ClientSend.ClientMove(PlayerMovement.Instance.transform.position, PlayerMovement.Instance.playerCam.transform.eulerAngles);
                     oldPos = PlayerMovement.Instance.transform.position;
-                    oldRot = PlayerMovement.Instance.transform.rotation.eulerAngles.y;
+                    oldRot = PlayerMovement.Instance.playerCam.transform.eulerAngles.y;
                 }
             }
         }

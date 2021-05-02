@@ -29,6 +29,8 @@ namespace KarlsonMPserver
             private NetworkStream stream;
             private Packet receivedData;
             private byte[] receiveBuffer;
+            public DateTime connectedTimeStamp;
+            //public bool connected; not needed bc the player field is != null when client is connected
             public TCP(int _id)
             {
                 id = _id;
@@ -43,11 +45,12 @@ namespace KarlsonMPserver
                 receiveBuffer = new byte[dataBufferSize];
                 stream.BeginRead(receiveBuffer, 0, dataBufferSize, ReceiveCallback, null);
                 ServerSend.Welcome(id, Program.config.motd);
+                connectedTimeStamp = DateTime.Now;
             }
 
             private void ReceiveCallback(IAsyncResult ar)
             {
-                if(stream == null)
+                if(stream == null || socket == null || !socket.Connected)
                 {
                     Server.clients[id].Disconnect();
                     return;
@@ -110,7 +113,7 @@ namespace KarlsonMPserver
             {
                 try
                 {
-                    if (socket == null)
+                    if (socket == null || !socket.Connected)
                         return;
                     stream.BeginWrite(_data, 0, _data.Length, null, null);
                 }

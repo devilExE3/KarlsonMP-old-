@@ -61,7 +61,7 @@ namespace KarlsonMPserver
                             {
                                 if (!int.TryParse(options[1], out int num))
                                 {
-                                    Program.Log("[CONFIG] Failed to parse int " + options[1] + " at line " + line);
+                                    Log("[CONFIG] Failed to parse int " + options[1] + " at line " + line);
                                     break;
                                 }
                                 tps = num;
@@ -70,8 +70,18 @@ namespace KarlsonMPserver
                         case "rcon-password":
                             rconpassword = options[1];
                             break;
+                        case "iplimit":
+                            {
+                                if (!int.TryParse(options[1], out int num))
+                                {
+                                    Log("[CONFIG] Failed to parse int " + options[1] + " at line " + line);
+                                    break;
+                                }
+                                iplimit = num;
+                                break;
+                            }
                         default:
-                            Program.Log("[CONFIG] Failed to load option " + set + " at line " + line);
+                            Log("[CONFIG] Failed to load option " + set + " at line " + line);
                             break;
                     }
                     line++;
@@ -80,14 +90,15 @@ namespace KarlsonMPserver
 
             private readonly static string[] validOptions = new string[]
             {
-                "port", "maxplayers", "motd", "tps", "rcon-password"
+                "port", "maxplayers", "motd", "tps", "rcon-password", "iplimit"
             };
 
-            public readonly int port;
-            public readonly int maxplayers;
-            public readonly string motd;
-            public readonly int tps;
-            public readonly string rconpassword;
+            public readonly int port            = 11337;
+            public readonly int maxplayers      = 15;
+            public readonly string motd         = "changeme";
+            public readonly int tps             = 30;
+            public readonly string rconpassword = "changeme";
+            public readonly int iplimit         = 2;
         }
 
         private static bool isRunning = false;
@@ -109,12 +120,13 @@ namespace KarlsonMPserver
                 File.AppendAllText(configFile, "maxplayers=50\n");
                 File.AppendAllText(configFile, "motd=Official main server\n");
                 File.AppendAllText(configFile, "tps=30\n");
-                File.AppendAllText(configFile, "rcon-password=changeme");
+                File.AppendAllText(configFile, "rcon-password=changeme\n");
+                File.AppendAllText(configFile, "iplimit=2\n");
             }
             config = new(configFile);
             if(config.rconpassword == "changeme")
             {
-                Program.Log("Please change the RCON password");
+                Log("Please change the RCON password");
                 return;
             }
             isRunning = true;
@@ -127,7 +139,7 @@ namespace KarlsonMPserver
 
         private static void MainThread()
         {
-            Program.Log($"Main thread started. Running at {config.tps}tps");
+            Log($"Main thread started. Running at {config.tps}tps");
             DateTime _nextLoop = DateTime.Now;
             while(isRunning)
             {
@@ -158,7 +170,21 @@ namespace KarlsonMPserver
             while(isRunning)
             {
                 ServerSend.PingAll();
+                ServerSend.ScoreboardAll();
                 PingServer();
+
+                // this kinda runs every second, which is useful ngl
+
+                for(int i = 1; i <= Server.MaxPlayers; i++)
+                {
+                    if(Server.clients[i].tcp.socket != null && Server.clients[i].player == null && (DateTime.Now - Server.clients[i].tcp.connectedTimeStamp).TotalMilliseconds >= 5000)
+                    {
+                        ServerSend.Chat(i, "<color=red>[SERVER] Didn't respond to welcome packet in time, disconnected.</color>");
+                        Log($"ID {i} timed out.");
+                        Server.clients[i].tcp.Disconnect();
+                    }
+                }
+
                 Thread.Sleep(1000);
             }
         }

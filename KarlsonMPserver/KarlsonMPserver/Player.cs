@@ -19,5 +19,6 @@ namespace KarlsonMPserver
         public string scene;
         public DateTime lastPing = DateTime.MinValue;
         public int ping = -1;
+        public int activeGun = 0;
     }
 }

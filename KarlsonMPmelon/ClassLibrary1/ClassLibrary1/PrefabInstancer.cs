@@ -66,15 +66,15 @@ namespace KarlsonMP
                 if (go.name == "Shotgun")
                 {
                     shotgun = UnityEngine.Object.Instantiate(go);
-                    shotgun.name = "KarlsonMP-Instance Pistol";
+                    shotgun.name = "KarlsonMP-Instance Shotgun";
                     UnityEngine.Object.DontDestroyOnLoad(shotgun);
                     shotgun.SetActive(false);
                     continue;
                 }
-                if (go.name == "grappler")
+                if (go.name == "Grappler")
                 {
                     grappler = UnityEngine.Object.Instantiate(go);
-                    grappler.name = "KarlsonMP-Instance Pistol";
+                    grappler.name = "KarlsonMP-Instance Grappler";
                     UnityEngine.Object.DontDestroyOnLoad(grappler);
                     grappler.SetActive(false);
                     continue;
@@ -98,6 +98,7 @@ namespace KarlsonMP
             GameObject go = UnityEngine.Object.Instantiate(enemy);
             go.name = "Player";
             go.SetActive(true);
+            go.GetComponent<NavMeshAgent>().enabled = false;
             return go;
         }
 

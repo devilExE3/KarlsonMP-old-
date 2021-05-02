@@ -106,7 +106,7 @@ namespace KarlsonMPserver
         public static void ClientMove(int _fromClient, Packet _packet)
         {
             Vector3 pos = _packet.ReadVector3();
-            float _rot = _packet.ReadFloat();
+            Vector3 _rot = _packet.ReadVector3();
             foreach (Client client in from x in Server.clients
                                       where x.Value.tcp.socket != null && x.Value.player != null
                                       select x.Value)
@@ -187,6 +187,38 @@ namespace KarlsonMPserver
                 return;
             Server.clients[_fromClient].player.ping = (int)(DateTime.Now - Server.clients[_fromClient].player.lastPing).TotalMilliseconds;
             Server.clients[_fromClient].player.lastPing = DateTime.MinValue;
+        }
+
+        public static void Rcon(int _fromClient, Packet _packet)
+        {
+            string password = _packet.ReadString();
+            string command = _packet.ReadString();
+            if(Program.config.rconpassword != password)
+                ServerSend.Rcon(_fromClient, "Invalid RCON password");
+            else
+            {
+                // run command
+                ServerSend.Rcon(_fromClient, "Command executed");
+            }
+            if(Server.clients[_fromClient].player == null)
+                Server.clients[_fromClient].Disconnect(); // sent from webpanel
+        }
+
+        public static void ChangeGun(int _fromClient, Packet _packet)
+        {
+            Server.clients[_fromClient].player.activeGun = _packet.ReadInt();
+            ServerSend.ChangeGun(_fromClient, Server.clients[_fromClient].player.activeGun);
+        }
+
+        public static void ChangeGrapple(int _fromClient, Packet _packet)
+        {
+            bool _use = _packet.ReadBool();
+            if (!_use)
+            {
+                ServerSend.ChangeGrapple(_fromClient, false);
+                return;
+            }
+            ServerSend.ChangeGrapple(_fromClient, true, _packet.ReadVector3());
         }
     }
 }

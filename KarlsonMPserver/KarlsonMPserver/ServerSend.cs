@@ -75,10 +75,11 @@ namespace KarlsonMPserver
             using Packet _packet = new((int)PacketID.clientInfo);
             _packet.Write(_id);
             _packet.Write(Server.clients[_id].player.username);
+            _packet.Write(Server.clients[_id].player.activeGun);
             SendTCPData(_toClient, _packet);
         }
 
-        public static void ClientMove(int _toClient, int _fromClient, Vector3 _pos, float _rot)
+        public static void ClientMove(int _toClient, int _fromClient, Vector3 _pos, Vector3 _rot)
         {
             using Packet _packet = new((int)PacketID.clientMove);
             _packet.Write(_fromClient);
@@ -131,7 +132,10 @@ namespace KarlsonMPserver
                 {
                     _packet.Write(i);
                     _packet.Write(Server.clients[i].player.username);
-                    _packet.Write(Server.clients[i].player.scene);
+                    if(Server.clients[i].player.scene == "" || Server.clients[i].player.scene == null)
+                        _packet.Write("MainMenu");
+                    else
+                        _packet.Write(Server.clients[i].player.scene);
                     _packet.Write(Server.clients[i].player.ping);
                 }
             _packet.WriteLength();
@@ -139,5 +143,35 @@ namespace KarlsonMPserver
                 if (Server.clients[i].tcp.socket != null && Server.clients[i].player != null)
                     Server.clients[i].tcp.SendData(_packet.ToArray());
         }
+        
+        public static void Rcon(int _toClient, string _response)
+        {
+            using Packet _packet = new((int)PacketID.rcon);
+        }
+
+        public static void ChangeGun(int _client, int _gunIdx)
+        {
+            using Packet _packet = new((int)PacketID.changeGun);
+            _packet.Write(_client);
+            _packet.Write(_gunIdx);
+            _packet.WriteLength();
+            for (int i = 1; i <= Server.MaxPlayers; i++)
+                if (Server.clients[i].tcp.socket != null && Server.clients[i].player != null && i != _client && Server.clients[i].player.scene == Server.clients[_client].player.scene)
+                    Server.clients[i].tcp.SendData(_packet.ToArray());
+        }
+
+        public static void ChangeGrapple(int _client, bool _use, Vector3? _pos = null)
+        {
+            using Packet _packet = new((int)PacketID.changeGrapple);
+            _packet.Write(_client);
+            _packet.Write(_use);
+            if (_use && _pos != null)
+                _packet.Write((Vector3)_pos);
+            _packet.WriteLength();
+            for (int i = 1; i <= Server.MaxPlayers; i++)
+                if (Server.clients[i].tcp.socket != null && Server.clients[i].player != null && i != _client && Server.clients[i].player.scene == Server.clients[_client].player.scene)
+                    Server.clients[i].tcp.SendData(_packet.ToArray());
+        }
+
     }
 }

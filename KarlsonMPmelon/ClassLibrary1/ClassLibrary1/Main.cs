@@ -29,7 +29,11 @@ namespace KarlsonMP
         {
             int[] nVer = Array.ConvertAll(newVer.Split('.'), s => int.Parse(s));
             int[] oVer = Array.ConvertAll(oldVer.Split('.'), s => int.Parse(s));
-            if(nVer[0] <= oVer[0] && nVer[1] <= oVer[1] && nVer[2] <= oVer[2])
+            if (nVer[0] <= oVer[0])
+                return false;
+            if (nVer[1] <= oVer[1])
+                return false;
+            if (nVer[2] <= oVer[2])
                 return false; // returns false also if the 'newVer' < 'oldVer'
             return true;
         }
@@ -95,6 +99,34 @@ namespace KarlsonMP
                 ipField = DataSave.IpHistory.Last(); // load last connected to ip
             SceneManager.sceneLoaded += OnSceneLoaded;
             ClientHandle.scoreboard = new ClientHandle.Scoreboard();
+
+            // load scoreboard tables
+            TperLevel = TableGui.TableView(new Rect(20f, 50f, 250f, 475f), "Players Per Level",
+                TableGui.TableStyle.window |
+                TableGui.TableStyle.dragWindow);
+            TperLevel.SetHeader("Level Name\tCount", new float[] { 210f, 40f });
+            TperLevel.items.Add("Tutorial\t0");
+            TperLevel.items.Add("Sandbox 0\t0");
+            TperLevel.items.Add("Sandbox 1\t0");
+            TperLevel.items.Add("Sandbox 2\t0");
+            TperLevel.items.Add("Escape 0\t0");
+            TperLevel.items.Add("Escape 1\t0");
+            TperLevel.items.Add("Escape 2\t0");
+            TperLevel.items.Add("Escape 3\t0");
+            TperLevel.items.Add("Sky 0\t0");
+            TperLevel.items.Add("Sky 1\t0");
+            TperLevel.items.Add("Sky 2\t0");
+            TplayerList = TableGui.TableView(new Rect(350f, 50f, 800f, 400f), "Online Player List",
+                TableGui.TableStyle.window |
+                TableGui.TableStyle.dragWindow |
+                TableGui.TableStyle.alterBg |
+                TableGui.TableStyle.lineColumn);
+            TplayerList.SetHeader("ID\tName\tScene\tPing", new float[]{
+                800f * 5/100,
+                800f * 50/100,
+                800f * 30/100,
+                800f * 15/100,
+            });
         }
 
         private void DownloadNewFile()
@@ -138,10 +170,13 @@ namespace KarlsonMP
         private static Rect popupWindow = new Rect(Screen.width / 2 - 150f, Screen.height / 2 - 100f, 300f, 200f);
         private static int progress = 0;
         private bool isChatOpened = false;
-        private bool isChatEnabled = true;
+        public static bool isChatEnabled { get; private set; } = true;
         private string chatField = "";
         private static string chat = "";
         private bool showPing = true;
+        private bool isScoreboardOpened = false;
+
+        private TableView TperLevel, TplayerList, TsessionPbs, Tgamerules;
         public override void OnGUI()
         {
             if(needToUpdate)
@@ -191,11 +226,19 @@ namespace KarlsonMP
                     }
 					if(Client.instance.isConnecting)
                     {
-						// TODO: cancel the timeout timer
 						Client.instance.Disconnect();
-						return;
+                        Client.instance.isConnected = false;
+                        Client.instance.isConnecting = false;
+                        if(Client.instance.connectionRetryToken != null)
+                        {
+                            MelonCoroutines.Stop(Client.instance.connectionRetryToken);
+                            Client.instance.connectionRetryToken = null;
+                        }
+                        return;
                     }
-					// parse ip
+                    // parse ip
+                    if (!ipField.Contains(':'))
+                        ipField += ":11337"; // default port
 					if (ipField.Split(':').Length != 2)
 						return;
                     if (!int.TryParse(ipField.Split(':')[1], out int port))
@@ -293,6 +336,12 @@ namespace KarlsonMP
                             showPing = !showPing;
                             success = true;
                         }
+                        if(message.ToLower() == "/grap")
+                        {
+                            GameObject go = PrefabInstancer.CreateGrappler();
+                            go.transform.position = PlayerMovement.Instance.transform.position;
+                            success = true;
+                        }
                         if (success)
                         {
                             isChatOpened = false;
@@ -314,16 +363,20 @@ namespace KarlsonMP
                 GUI.Label(new Rect(4f, Screen.height - pingSize.y, pingSize.x, pingSize.y), pingStr); // wierd, i know
             }
 
-            if(Client.instance.isConnected && Input.GetKey(KeyCode.Tab))
+            if(Client.instance.isConnected && isScoreboardOpened)
             {
-                string insceneText = "<size=20><b>";
-                for (int i = 0; i < 11; i++)
-                    insceneText += sceneNames[i] + ": " + ClientHandle.scoreboard.perLevel[i] + '\n';
-                insceneText = insceneText.Trim();
-                insceneText += "</b></size>";
-                Vector2 insceneSize = GUI.skin.label.CalcSize(new GUIContent(insceneText));
-                GUI.Box(new Rect(20f, 20f, insceneSize.x + 8f, insceneSize.y + 20f), "Players In Level");
-                GUI.Label(new Rect(24f, 40f, insceneSize.x, insceneSize.y), insceneText);
+                GUI.Box(new Rect(-5f, -5f, Screen.width + 10f, Screen.height + 10f), $"\n<size=30>[{ClientHandle.scoreboard.onlinePlayers}/{ClientHandle.scoreboard.maxPlayers}] - {ClientHandle.scoreboard.motd}</size>");
+                for(int i = 0; i < 11; i++)
+                    TperLevel.items[i] = sceneNames[i] + '\t' + ClientHandle.scoreboard.perLevel[i];
+                TperLevel.Draw();
+
+                TplayerList.items.Clear();
+                foreach(var player in ClientHandle.scoreboard.players)
+                    TplayerList.items.Add(player.id + "\t" + player.username + "\t" + sceneNames[allowedSceneNames.ToList().IndexOf(player.scene)] + "\t" + player.ping + "ms");
+                TplayerList.Draw();
+
+                /*Tgamerules.Draw();
+                TsessionPbs.Draw();*/
             }
         }
 
@@ -336,11 +389,13 @@ namespace KarlsonMP
 
         private static bool firstWinFrame = false;
 
+        private bool noclip = false;
+
         public override void OnUpdate()
         {
             ThreadManager.UpdateMain();
             PosSender.Update();
-            if (!isChatOpened && (Input.GetKeyDown(KeyCode.T) || Input.GetKeyDown(KeyCode.Return)))
+            if (!isChatOpened && Input.GetKeyDown(KeyCode.T))
             {
                 isChatOpened = true;
                 chatField = "";
@@ -354,6 +409,36 @@ namespace KarlsonMP
                 }
                 if (!UIManger.Instance.winUI.activeSelf && firstWinFrame)
                     firstWinFrame = false;
+            }
+            if (Client.instance.isConnected && Input.GetKeyDown(KeyCode.Tab))
+                isScoreboardOpened = !isScoreboardOpened;
+            if (Input.GetKeyDown(KeyCode.V))
+            {
+                noclip = !noclip;
+                if (noclip)
+                {
+                    PlayerMovement.Instance.GetComponent<Collider>().enabled = false;
+                    PlayerMovement.Instance.GetComponent<Rigidbody>().isKinematic = true;
+                }
+                else
+                {
+                    PlayerMovement.Instance.GetComponent<Collider>().enabled = true;
+                    PlayerMovement.Instance.GetComponent<Rigidbody>().isKinematic = false;
+                }
+            }
+            if (noclip)
+            {
+                float speed = 0.7f;
+                if (Input.GetKey(KeyCode.LeftShift))
+                    speed = 1.2f;
+                if (Input.GetKey(KeyCode.W))
+                    PlayerMovement.Instance.transform.position += Camera.main.transform.forward * speed;
+                if (Input.GetKey(KeyCode.S))
+                    PlayerMovement.Instance.transform.position -= Camera.main.transform.forward * speed;
+                if (Input.GetKey(KeyCode.A))
+                    PlayerMovement.Instance.transform.position -= Camera.main.transform.right * speed;
+                if (Input.GetKey(KeyCode.D))
+                    PlayerMovement.Instance.transform.position += Camera.main.transform.right * speed;
             }
         }
         public override void OnApplicationQuit()

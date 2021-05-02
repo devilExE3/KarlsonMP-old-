@@ -9,7 +9,7 @@ namespace KarlsonMPserver
     class Constants
     {
         // constants
-        public const string version = "1.0.2";
+        public const string version = "1.1.0";
 
         public static readonly string[] allowedSceneNames = new string[]
         {
@@ -33,7 +33,7 @@ namespace KarlsonMPserver
             int _seconds = _miliseconds % 60;
             _miliseconds /= 60;
             int _minutes = _miliseconds % 60;
-            return Twodigit(_minutes) + ":" + Twodigit(_seconds) + ":" + Twodigit(_ms / 10);
+            return Twodigit(_minutes) + ":" + Twodigit(_seconds) + "." + Twodigit(_ms / 10);
         }
         private static string Twodigit(int i)
         {

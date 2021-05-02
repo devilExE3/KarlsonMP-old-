@@ -42,6 +42,17 @@ namespace KarlsonMPserver
         {
             TcpClient _client = listener.EndAcceptTcpClient(ar);
             listener.BeginAcceptTcpClient(TCPConnectCallback, null);
+            int onthisip = 0;
+            for (int i = 1; i <= MaxPlayers; i++)
+                if (clients[i].tcp.socket != null)
+                    if (clients[i].tcp.socket.Client.RemoteEndPoint.ToString().Split(':')[0] == _client.Client.RemoteEndPoint.ToString().Split(':')[0])
+                        onthisip++;
+            if(onthisip >= Program.config.iplimit)
+            {
+                Program.Log($"{_client.Client.RemoteEndPoint} connected from the same ip more than {Program.config.iplimit} times, dropped.");
+                _client.Close();
+                return;
+            }
             Program.Log($"Incoming connection from {_client.Client.RemoteEndPoint}");
             for(int i = 1; i <= MaxPlayers; i++)
                 if(clients[i].tcp.socket == null)
@@ -66,6 +77,9 @@ namespace KarlsonMPserver
                 { (int)PacketID.chat,           ServerHandle.Chat },
                 { (int)PacketID.finishLevel,    ServerHandle.FinishLevel },
                 { (int)PacketID.ping,           ServerHandle.Ping },
+                { (int)PacketID.rcon,           ServerHandle.Rcon },
+                { (int)PacketID.changeGun,      ServerHandle.ChangeGun },
+                { (int)PacketID.changeGrapple,  ServerHandle.ChangeGrapple },
             };
         }
     }
