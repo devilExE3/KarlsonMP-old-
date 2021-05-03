@@ -2,12 +2,12 @@
  Karlson (itch.io) modification that adds multiplayer (currently only racing mode)
 
 ## To be added
-- [ ] Auto updater
-- [ ] Wrong version popup
-- [ ] ip history
+- [x] Auto updater
+- [x] Wrong version popup
+- [x] ip history
 
 ## To be fixed
-- [ ] Properly disconnecting clients from the server
+- [x] Properly disconnecting clients from the server
 
 ### Links
 - [KarlsonMP wiki (mentained by Xiloe)](https://github.com/karlsonmodding/karlson-modding-wiki/wiki/How-to-play-Multiplayer-Karlson)
