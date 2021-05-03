@@ -1,5 +1,6 @@
 KarlsonMPserver/KarlsonMPserver/bin/*
 KarlsonMPserver/KarlsonMPserver/obj/*
+KarlsonMPserver/linux-build/*
 KarlsonMPclient/KarlsonMPclient/bin/*
 KarlsonMPclient/KarlsonMPclient/obj/*
 KarlsonMPserver/.vs/*
@@ -7,3 +8,6 @@ KarlsonMPclient/.vs/*
 KarlsonMPmelon/ClassLibrary1/.vs/*
 KarlsonMPmelon/ClassLibrary1/ClassLibrary1/bin/*
 KarlsonMPmelon/ClassLibrary1/ClassLibrary1/obj/*
+KarlsonMPbepinex/.vs/*
+KarlsonMPbepinex/KarlsonMPbepinex/bin/*
+KarlsonMPbepinex/KarlsonMPbepinex/obj/*

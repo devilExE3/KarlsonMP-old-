@@ -1,5 +1,4 @@
-﻿using MelonLoader;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -7,88 +6,19 @@ using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using BepInEx;
 
 namespace KarlsonMP
 {
-    public class Main : MelonMod
+    [BepInPlugin("me.devilexe.karlsonmp", "KarlsonMP", "1.1.2")]
+    public class Main : BaseUnityPlugin
     {
-        public class KarlsonMPversion
+        // autoupdater disabled
+        public static Main instance;
+
+        public void Awake()
         {
-            public KarlsonMPversion(string _ver, string _link, string _chanelog)
-            {
-                version = _ver;
-                link = _link;
-                changelog = _chanelog;
-            }
-            public string version;
-            public string link;
-            public string changelog;
-        }
-
-        private bool OutOfDate(string newVer, string oldVer)
-        {
-            int[] nVer = Array.ConvertAll(newVer.Split('.'), s => int.Parse(s));
-            int[] oVer = Array.ConvertAll(oldVer.Split('.'), s => int.Parse(s));
-            if (nVer[0] <= oVer[0])
-                return false;
-            if (nVer[1] <= oVer[1])
-                return false;
-            if (nVer[2] <= oVer[2])
-                return false; // returns false also if the 'newVer' < 'oldVer'
-            return true;
-        }
-
-        private static bool needToUpdate = false;
-        private static string updateLink = string.Empty;
-        private static string oldVer = string.Empty;
-        private static string newVer = string.Empty;
-        private static string changelog = string.Empty;
-
-        private static string GetUpdateInfo()
-        {
-            using(TcpClient client = new TcpClient("api.xiloe.fr", 80))
-            using (StreamWriter writer = new StreamWriter(client.GetStream()))
-            using (StreamReader reader = new StreamReader(client.GetStream()))
-            {
-                writer.AutoFlush = true;
-                writer.WriteLine("GET /karlson/version.json HTTP/1.1");
-                writer.WriteLine("Host: api.xiloe.fr:80");
-                writer.WriteLine("Connection: close");
-                writer.WriteLine("Content-Type: application/json");
-                writer.WriteLine("");
-
-                string str = reader.ReadToEnd();
-                return str.Substring(str.IndexOf('{'));
-            }
-        }
-
-        private void CheckForUpdates()
-        {
-            string json = GetUpdateInfo();
-            KarlsonMPversion ver = JsonUtility.FromJson<KarlsonMPversion>(json);
-            // get current version from assembly info, so we only need to change it in one place :D
-            object[] customAttributes = GetType().Assembly.GetCustomAttributes(false);
-            string oldVer = "0.0.0"; // should always return true in OutOfDate if foreach failes
-            foreach (var ca in customAttributes)
-            {
-                if (ca.GetType() != typeof(MelonInfoAttribute))
-                    continue;
-                oldVer = ((MelonInfoAttribute)ca).Version;
-            }
-            if (OutOfDate(ver.version, oldVer))
-            {
-                needToUpdate = true;
-                updateLink = ver.link;
-                Main.oldVer = oldVer;
-                newVer = ver.version;
-                changelog = ver.changelog;
-            }
-        }
-
-        public override void OnApplicationLateStart()
-        {
-            if (!Environment.GetCommandLineArgs().Contains("-disable-updater"))
-                CheckForUpdates();
+            instance = this;
             if (Client.instance == null)
             {
                 Client.instance = new Client();
@@ -101,9 +31,9 @@ namespace KarlsonMP
             ClientHandle.scoreboard = new ClientHandle.Scoreboard();
 
             // load scoreboard tables
-            TperLevel = TableGui.TableView(new Rect(20f, 50f, 250f, 475f), "Players Per Level",
-                TableGui.TableStyle.window |
-                TableGui.TableStyle.dragWindow);
+            TperLevel = new TableView(new Rect(20f, 50f, 250f, 475f), "Players Per Level",
+                TableView.TableStyle.window |
+                TableView.TableStyle.dragWindow, 0);
             TperLevel.SetHeader("Level Name\tCount", new float[] { 210f, 40f });
             TperLevel.items.Add("Tutorial\t0");
             TperLevel.items.Add("Sandbox 0\t0");
@@ -116,28 +46,17 @@ namespace KarlsonMP
             TperLevel.items.Add("Sky 0\t0");
             TperLevel.items.Add("Sky 1\t0");
             TperLevel.items.Add("Sky 2\t0");
-            TplayerList = TableGui.TableView(new Rect(350f, 50f, 800f, 400f), "Online Player List",
-                TableGui.TableStyle.window |
-                TableGui.TableStyle.dragWindow |
-                TableGui.TableStyle.alterBg |
-                TableGui.TableStyle.lineColumn);
+            TplayerList = new TableView(new Rect(350f, 50f, 800f, 400f), "Online Player List",
+                TableView.TableStyle.window |
+                TableView.TableStyle.dragWindow |
+                TableView.TableStyle.alterBg |
+                TableView.TableStyle.lineColumn, 1);
             TplayerList.SetHeader("ID\tName\tScene\tPing", new float[]{
                 800f * 5/100,
                 800f * 50/100,
                 800f * 30/100,
                 800f * 15/100,
             });
-        }
-
-        private void DownloadNewFile()
-        {
-            File.Delete(Path.Combine(MelonHandler.ModsDirectory, "KarlsonMP.dll"));
-            using (WebClient wc = new WebClient())
-            {
-                wc.DownloadFile(new Uri(updateLink), Path.Combine(MelonHandler.ModsDirectory, "KarlsonMP.dll"));
-                Process.Start(Path.Combine(Application.dataPath, "..", "Karlson.exe"));
-                Application.Quit(0);
-            }
         }
 
         private static string oldScene = "";
@@ -167,8 +86,6 @@ namespace KarlsonMP
         private static string ipField = "";
         private static bool historyShown = false;
         private static Vector2 ipHistoryScroll = Vector2.zero;
-        private static Rect popupWindow = new Rect(Screen.width / 2 - 150f, Screen.height / 2 - 100f, 300f, 200f);
-        private static int progress = 0;
         private bool isChatOpened = false;
         public static bool IsChatEnabled { get; private set; } = true;
         private string chatField = "";
@@ -177,29 +94,8 @@ namespace KarlsonMP
         private bool isScoreboardOpened = false;
 
         private TableView TperLevel, TplayerList, TsessionPbs, Tgamerules;
-        public override void OnGUI()
+        public void OnGUI()
         {
-            if(needToUpdate)
-            {
-                GUI.Box(popupWindow, "KarlsonMP Update");
-                GUIStyle middle = new GUIStyle();
-                middle.normal.textColor = Color.white;
-                middle.alignment = TextAnchor.UpperCenter;
-                GUI.BeginGroup(popupWindow);
-                if(progress == 0)
-                    GUI.Label(new Rect(3f, 20f, 300f, 380f), "KarlsonMP just got updated! YAY\nCurrent version: " + oldVer + " -> New version: " + newVer + "\n\nChangelog:\n" + changelog);
-                else
-                    GUI.Label(new Rect(0f, 20f, 300f, 380f), "\n\nUpdating, please do not exit the game..\n(your install will be corrupted otherwise)", middle);
-                //GUI.Box(new Rect(0f, 360f, 300f * progress, 10f), "", whiteBox); // progress bar to show how fast 23kb of data downloaded lmao
-                if (GUI.Button(new Rect(150f, 170f, 150f, 30f), "Cancel - You won't be\nable play multiplayer"))
-                    needToUpdate = false;
-                if (GUI.Button(new Rect(0f, 170f, 150f, 30f), "Update"))
-                {
-                    progress = 1;
-                    DownloadNewFile();
-                }
-                GUI.EndGroup();
-            }
             if (SceneManager.GetActiveScene().name == "MainMenu" || UIManger.Instance.deadUI.activeSelf || UIManger.Instance.winUI.activeSelf)
 			{
 				GUI.Box(new Rect(Screen.width / 2 - 150f, Screen.height - 40f, 300f, 40f), "");
@@ -231,7 +127,7 @@ namespace KarlsonMP
                         Client.instance.isConnecting = false;
                         if(Client.instance.connectionRetryToken != null)
                         {
-                            MelonCoroutines.Stop(Client.instance.connectionRetryToken);
+                            
                             Client.instance.connectionRetryToken = null;
                         }
                         return;
@@ -383,7 +279,7 @@ namespace KarlsonMP
 
         private static bool firstWinFrame = false;
 
-        public override void OnUpdate()
+        public void Update()
         {
             ThreadManager.UpdateMain();
             PosSender.Update();
@@ -436,7 +332,7 @@ namespace KarlsonMP
             if (Time.frameCount % 60 == 0)
                 GC.Collect();
         }
-        public override void OnApplicationQuit()
+        public void OnApplicationQuit()
         {
             Client.instance.Disconnect();
         }

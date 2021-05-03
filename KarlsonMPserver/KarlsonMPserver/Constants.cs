@@ -9,7 +9,7 @@ namespace KarlsonMPserver
     class Constants
     {
         // constants
-        public const string version = "1.1.0";
+        public const string version = "1.1.2";
 
         public static readonly string[] allowedSceneNames = new string[]
         {

@@ -1,5 +1,4 @@
-﻿using MelonLoader;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -35,6 +34,3 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-
-[assembly: MelonInfo(typeof(KarlsonMP.Main), "KarlsonMP", "1.1.1", "devilExE")]
-[assembly: MelonGame("Dani", "Karlson")]

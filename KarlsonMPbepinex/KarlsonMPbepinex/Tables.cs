@@ -7,52 +7,35 @@ using UnityEngine;
 
 namespace KarlsonMP
 {
-    class TableGui
-    {
-        public static TableView TableView(Rect position, string title, TableStyle style)
-        {
-            TableView view = new TableView(position, title, style, tables.Count);
-            tables.Add(view);
-            return view;
-        }
-
-        public static void DrawTables()
-        {
-            tables.ForEach(t => t.Draw());
-        }
-
-
-        internal static List<TableView> tables = new List<TableView>();
-
-        public enum TableStyle
-        {
-            alterBg        = 0b1,        // alternate background between rows
-            lineColumn     = 0b10,       // draw a line at each column
-            dynamicColumns = 0b100,      // make user able to resize row width
-            window         = 0b1000,     // put the table in a window instead of a standard box
-            dynamicHeight  = 0b10000,    // tables have dynamic height, based on number of elements
-            dragWindow     = 0b100000,   // allow user to drag the window; only works if window is set
-        }
-    }
 
     class TableView
     {
-        public TableView(Rect _position, string _title, TableGui.TableStyle _style, int _windowId)
+        public enum TableStyle
+        {
+            alterBg = 0b1,        // alternate background between rows
+            lineColumn = 0b10,       // draw a line at each column
+            dynamicColumns = 0b100,      // make user able to resize row width
+            window = 0b1000,     // put the table in a window instead of a standard box
+            dynamicHeight = 0b10000,    // tables have dynamic height, based on number of elements
+            dragWindow = 0b100000,   // allow user to drag the window; only works if window is set
+        }
+
+        public TableView(Rect _position, string _title, TableStyle _style, int _windowId)
         {
             pos = _position;
             title = _title;
             maxHeight = _position.height;
-            if ((_style & TableGui.TableStyle.alterBg) == TableGui.TableStyle.alterBg)
+            if ((_style & TableStyle.alterBg) == TableStyle.alterBg)
                 alterBg = true;
-            if ((_style & TableGui.TableStyle.lineColumn) == TableGui.TableStyle.lineColumn)
+            if ((_style & TableStyle.lineColumn) == TableStyle.lineColumn)
                 lineColumn = true;
-            if ((_style & TableGui.TableStyle.dynamicColumns) == TableGui.TableStyle.dynamicColumns)
+            if ((_style & TableStyle.dynamicColumns) == TableStyle.dynamicColumns)
                 dynamicColumns = true;
-            if ((_style & TableGui.TableStyle.window) == TableGui.TableStyle.window)
+            if ((_style & TableStyle.window) == TableStyle.window)
                 window = true;
-            if ((_style & TableGui.TableStyle.dynamicHeight) == TableGui.TableStyle.dynamicHeight)
+            if ((_style & TableStyle.dynamicHeight) == TableStyle.dynamicHeight)
                 dynamicHeight = true;
-            if ((_style & TableGui.TableStyle.dragWindow) == TableGui.TableStyle.dragWindow)
+            if ((_style & TableStyle.dragWindow) == TableStyle.dragWindow)
                 dragWindow = true;
             windowId = _windowId;
         }
